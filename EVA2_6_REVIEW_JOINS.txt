@@ -1,0 +1,2598 @@
+MySQL Shell 1.0.11
+
+Copyright (c) 2016, 2017, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type '\help' or '\?' for help; '\quit' to exit.
+
+Currently in JavaScript mode. Use \sql to switch to SQL mode and execute queries.
+mysql-js> \sql
+Switching to SQL mode... Commands end with ;
+mysql-sql> \connect -c root@localhost:_3306
+ERROR: Illegal character [_] found at position 15
+mysql-sql> \connect -c root@localhost: 3306
+\connect [-<type>] <uri or $name>
+mysql-sql> \connect -c root@localhost_ 3306
+\connect [-<type>] <uri or $name>
+mysql-sql> \sql
+mysql-sql> \connect -c root@localhost:3306
+Creating a Classic Session to 'root@localhost:3306'
+Enter password: ****
+Your MySQL connection id is 2
+Server version: 5.7.21-log MySQL Community Server (GPL)
+No default schema selected; type \use <schema> to set one.
+mysql-sql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| ejercicios         |
+| evaluacion_2       |
+| mundo              |
+| mysql              |
+| northwind          |
+| performance_schema |
+| personal           |
+| sys                |
+| tecnologico        |
+| world              |
++--------------------+
+11 rows in set (0.23 sec)
+mysql-sql> use evaluacion_2
+       ... ;
+Query OK, 0 rows affected (0.07 sec)
+mysql-sql> show tables;
++------------------------+
+| Tables_in_evaluacion_2 |
++------------------------+
+| a                      |
+| alumnos                |
+| b                      |
+| detalle                |
+| detalle_materias       |
+| hijo                   |
+| hijos_2                |
+| horarios               |
+| maestro                |
+| materias               |
+| padre                  |
++------------------------+
+11 rows in set (0.02 sec)
+mysql-sql> select * from a;
++----+--------+
+| id | nombre |
++----+--------+
+|  1 | A      |
+|  2 | B      |
+|  3 | C      |
+|  4 | D      |
++----+--------+
+4 rows in set (0.29 sec)
+mysql-sql> select * from b;
++----+--------+
+| id | nombre |
++----+--------+
+|  1 | X      |
+|  2 | Y      |
+|  3 | Z      |
+|  4 | A      |
+|  5 | B      |
++----+--------+
+5 rows in set (0.06 sec)
+mysql-sql> select * from A inner join B on A.nombre = B.nombre;
++----+--------+----+--------+
+| id | nombre | id | nombre |
++----+--------+----+--------+
+|  1 | A      |  4 | A      |
+|  2 | B      |  5 | B      |
++----+--------+----+--------+
+2 rows in set (0.22 sec)
+mysql-sql> select * from A left outer join B on A.nombre = b.nombre;
++----+--------+------+--------+
+| id | nombre | id   | nombre |
++----+--------+------+--------+
+|  1 | A      |    4 | A      |
+|  2 | B      |    5 | B      |
+|  3 | C      | null | null   |
+|  4 | D      | null | null   |
++----+--------+------+--------+
+4 rows in set (0.08 sec)
+mysql-sql> select * from A right outer join B on A.nombre = B.nombre;
++------+--------+----+--------+
+| id   | nombre | id | nombre |
++------+--------+----+--------+
+|    1 | A      |  4 | A      |
+|    2 | B      |  5 | B      |
+| null | null   |  1 | X      |
+| null | null   |  2 | Y      |
+| null | null   |  3 | Z      |
++------+--------+----+--------+
+5 rows in set (0.01 sec)
+mysql-sql> select * from A right outer join B on A.nombre = B.nombre where B.nombre is null;
+Empty set (0.06 sec)
+mysql-sql> select * from A left outer join B on A.nombre = B.nombre where B.nombre is null;
++----+--------+------+--------+
+| id | nombre | id   | nombre |
++----+--------+------+--------+
+|  3 | C      | null | null   |
+|  4 | D      | null | null   |
++----+--------+------+--------+
+2 rows in set (0.00 sec)
+mysql-sql> select * from A right outer join B on A.nombre = B.nombre where A.nombre is null;
++------+--------+----+--------+
+| id   | nombre | id | nombre |
++------+--------+----+--------+
+| null | null   |  1 | X      |
+| null | null   |  2 | Y      |
+| null | null   |  3 | Z      |
++------+--------+----+--------+
+3 rows in set (0.00 sec)
+mysql-sql> select * from A union select * from B;
++----+--------+
+| id | nombre |
++----+--------+
+|  1 | A      |
+|  2 | B      |
+|  3 | C      |
+|  4 | D      |
+|  1 | X      |
+|  2 | Y      |
+|  3 | Z      |
+|  4 | A      |
+|  5 | B      |
++----+--------+
+9 rows in set (0.18 sec)
+mysql-sql> select * from A left outer join B on A.nombre = B.nombre where B.nombre is null union select * from A right outer join B on A.nombre = B.nombre where a.nombre is null;
++------+--------+------+--------+
+| id   | nombre | id   | nombre |
++------+--------+------+--------+
+|    3 | C      | null | null   |
+|    4 | D      | null | null   |
+| null | null   |    1 | X      |
+| null | null   |    2 | Y      |
+| null | null   |    3 | Z      |
++------+--------+------+--------+
+5 rows in set (0.04 sec)
+mysql-sql> select * from A left outer join B on A.nombre = B.nombre where B.nombre is null union select * from A right outer join B on A.nombre = B.nombre where a.nombre is null;
++------+--------+------+--------+
+| id   | nombre | id   | nombre |
++------+--------+------+--------+
+|    3 | C      | null | null   |
+|    4 | D      | null | null   |
+| null | null   |    1 | X      |
+| null | null   |    2 | Y      |
+| null | null   |    3 | Z      |
++------+--------+------+--------+
+5 rows in set (0.00 sec)
+mysql-sql> select * from A inner join B on A.nombre = B.nombre
+       ... union all
+       ... select * from A left outer join B on A.nombre = B.nombre where B.nombre is null
+       ... union all
+       ... select * from A right outer join B on A.nombre = B.nombre where A.nombre is null;
++------+--------+------+--------+
+| id   | nombre | id   | nombre |
++------+--------+------+--------+
+|    1 | A      |    4 | A      |
+|    2 | B      |    5 | B      |
+|    3 | C      | null | null   |
+|    4 | D      | null | null   |
+| null | null   |    1 | X      |
+| null | null   |    2 | Y      |
+| null | null   |    3 | Z      |
++------+--------+------+--------+
+7 rows in set (0.01 sec)
+mysql-sql> use northwind;
+Query OK, 0 rows affected (0.00 sec)
+mysql-sql> show tables;
++----------------------+
+| Tables_in_northwind  |
++----------------------+
+| categories           |
+| customercustomerdemo |
+| customerdemographics |
+| customers            |
+| employees            |
+| employeeterritories  |
+| orderdetails         |
+| orders               |
+| products             |
+| region               |
+| shippers             |
+| suppliers            |
+| territories          |
++----------------------+
+13 rows in set (0.03 sec)
+mysql-sql> desc customers:
+       ... ;
+ERROR: 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ':' at line 1
+mysql-sql> desc customers;
++--------------+-------------+------+-----+---------+-------+
+| Field        | Type        | Null | Key | Default | Extra |
++--------------+-------------+------+-----+---------+-------+
+| CustomerID   | varchar(5)  | NO   | PRI | null    |       |
+| CompanyName  | varchar(40) | NO   | MUL | null    |       |
+| ContactName  | varchar(30) | YES  |     | null    |       |
+| ContactTitle | varchar(30) | YES  |     | null    |       |
+| Address      | varchar(60) | YES  |     | null    |       |
+| City         | varchar(15) | YES  | MUL | null    |       |
+| Region       | varchar(15) | YES  | MUL | null    |       |
+| PostalCode   | varchar(10) | YES  | MUL | null    |       |
+| Country      | varchar(15) | YES  |     | null    |       |
+| Phone        | varchar(24) | YES  |     | null    |       |
+| Fax          | varchar(24) | YES  |     | null    |       |
++--------------+-------------+------+-----+---------+-------+
+11 rows in set (0.24 sec)
+mysql-sql> desc orders;
++----------------+---------------+------+-----+---------+----------------+
+| Field          | Type          | Null | Key | Default | Extra          |
++----------------+---------------+------+-----+---------+----------------+
+| OrderID        | int(11)       | NO   | PRI | null    | auto_increment |
+| CustomerID     | varchar(5)    | YES  | MUL | null    |                |
+| EmployeeID     | int(11)       | YES  | MUL | null    |                |
+| OrderDate      | datetime      | YES  | MUL | null    |                |
+| RequiredDate   | datetime      | YES  |     | null    |                |
+| ShippedDate    | datetime      | YES  | MUL | null    |                |
+| ShipVia        | int(11)       | YES  | MUL | null    |                |
+| Freight        | decimal(10,4) | YES  |     | 0.0000  |                |
+| ShipName       | varchar(40)   | YES  |     | null    |                |
+| ShipAddress    | varchar(60)   | YES  |     | null    |                |
+| ShipCity       | varchar(15)   | YES  |     | null    |                |
+| ShipRegion     | varchar(15)   | YES  |     | null    |                |
+| ShipPostalCode | varchar(10)   | YES  | MUL | null    |                |
+| ShipCountry    | varchar(15)   | YES  |     | null    |                |
++----------------+---------------+------+-----+---------+----------------+
+14 rows in set (0.10 sec)
+mysql-sql> select A.orderid, B.contactname from orders A inner join customers B on A.customerid = B.customerid limit 30;
++---------+----------------+
+| orderid | contactname    |
++---------+----------------+
+|   10643 | Maria Anders   |
+|   10692 | Maria Anders   |
+|   10702 | Maria Anders   |
+|   10835 | Maria Anders   |
+|   10952 | Maria Anders   |
+|   11011 | Maria Anders   |
+|   10308 | Ana Trujillo   |
+|   10625 | Ana Trujillo   |
+|   10759 | Ana Trujillo   |
+|   10926 | Ana Trujillo   |
+|   10365 | Antonio Moreno |
+|   10507 | Antonio Moreno |
+|   10535 | Antonio Moreno |
+|   10573 | Antonio Moreno |
+|   10677 | Antonio Moreno |
+|   10682 | Antonio Moreno |
+|   10856 | Antonio Moreno |
+|   10355 | Thomas Hardy   |
+|   10383 | Thomas Hardy   |
+|   10453 | Thomas Hardy   |
+|   10558 | Thomas Hardy   |
+|   10707 | Thomas Hardy   |
+|   10741 | Thomas Hardy   |
+|   10743 | Thomas Hardy   |
+|   10768 | Thomas Hardy   |
+|   10793 | Thomas Hardy   |
+|   10864 | Thomas Hardy   |
+|   10920 | Thomas Hardy   |
+|   10953 | Thomas Hardy   |
+|   11016 | Thomas Hardy   |
++---------+----------------+
+30 rows in set (0.09 sec)
+mysql-sql> select b.contactname from orders A right outer join customers B on A.customerid = B.customerid where A.customerid is null;
++----------------+
+| contactname    |
++----------------+
+| Diego Roel     |
+| Marie Bertrand |
+| Val2           |
+| Valon Hoti     |
++----------------+
+4 rows in set (0.00 sec)
+mysql-sql> select A.orderid from orders A left outer join customers B on A.customerid = B.customerid
+       ... where B.customerid is null;
+Empty set (0.05 sec)
+mysql-sql> show tables;
++----------------------+
+| Tables_in_northwind  |
++----------------------+
+| categories           |
+| customercustomerdemo |
+| customerdemographics |
+| customers            |
+| employees            |
+| employeeterritories  |
+| orderdetails         |
+| orders               |
+| products             |
+| region               |
+| shippers             |
+| suppliers            |
+| territories          |
++----------------------+
+13 rows in set (0.00 sec)
+mysql-sql> desc orderdetails;
++-----------+---------------+------+-----+---------+-------+
+| Field     | Type          | Null | Key | Default | Extra |
++-----------+---------------+------+-----+---------+-------+
+| OrderID   | int(11)       | NO   | PRI | null    |       |
+| ProductID | int(11)       | NO   | PRI | null    |       |
+| UnitPrice | decimal(10,4) | NO   |     | 0.0000  |       |
+| Quantity  | smallint(2)   | NO   |     | 1       |       |
+| Discount  | double(8,0)   | NO   |     | 0       |       |
++-----------+---------------+------+-----+---------+-------+
+5 rows in set (0.08 sec)
+mysql-sql> desc products;
++-----------------+---------------+------+-----+---------+----------------+
+| Field           | Type          | Null | Key | Default | Extra          |
++-----------------+---------------+------+-----+---------+----------------+
+| ProductID       | int(11)       | NO   | PRI | null    | auto_increment |
+| ProductName     | varchar(40)   | NO   | MUL | null    |                |
+| SupplierID      | int(11)       | YES  | MUL | null    |                |
+| CategoryID      | int(11)       | YES  | MUL | null    |                |
+| QuantityPerUnit | varchar(20)   | YES  |     | null    |                |
+| UnitPrice       | decimal(10,4) | YES  |     | 0.0000  |                |
+| UnitsInStock    | smallint(2)   | YES  |     | 0       |                |
+| UnitsOnOrder    | smallint(2)   | YES  |     | 0       |                |
+| ReorderLevel    | smallint(2)   | YES  |     | 0       |                |
+| Discontinued    | bit(1)        | NO   |     | b'0'    |                |
++-----------------+---------------+------+-----+---------+----------------+
+10 rows in set (0.04 sec)
+mysql-sql> select B.productname, A.unitprice, A.quantity from orderdetails A inner join products B on A.productid = B.productid;
++----------------------------------+-----------+----------+
+| productname                      | unitprice | quantity |
++----------------------------------+-----------+----------+
+| Alice Mutton                     |   31.2000 |       30 |
+| Alice Mutton                     |   31.2000 |       15 |
+| Alice Mutton                     |   31.2000 |       15 |
+| Alice Mutton                     |   31.2000 |       40 |
+| Alice Mutton                     |   31.2000 |        8 |
+| Alice Mutton                     |   31.2000 |       20 |
+| Alice Mutton                     |   31.2000 |       70 |
+| Alice Mutton                     |   31.2000 |       36 |
+| Alice Mutton                     |   31.2000 |        2 |
+| Alice Mutton                     |   31.2000 |       45 |
+| Alice Mutton                     |   31.2000 |       50 |
+| Alice Mutton                     |   31.2000 |       10 |
+| Alice Mutton                     |   39.0000 |       25 |
+| Alice Mutton                     |   39.0000 |       40 |
+| Alice Mutton                     |   39.0000 |        8 |
+| Alice Mutton                     |   39.0000 |       16 |
+| Alice Mutton                     |   39.0000 |       18 |
+| Alice Mutton                     |   39.0000 |      100 |
+| Alice Mutton                     |   39.0000 |       30 |
+| Alice Mutton                     |   39.0000 |       20 |
+| Alice Mutton                     |   39.0000 |        8 |
+| Alice Mutton                     |   39.0000 |       27 |
+| Alice Mutton                     |   39.0000 |       20 |
+| Alice Mutton                     |   39.0000 |       33 |
+| Alice Mutton                     |   39.0000 |       35 |
+| Alice Mutton                     |   39.0000 |       40 |
+| Alice Mutton                     |   39.0000 |        6 |
+| Alice Mutton                     |   39.0000 |       42 |
+| Alice Mutton                     |   39.0000 |       16 |
+| Alice Mutton                     |   39.0000 |       15 |
+| Alice Mutton                     |   39.0000 |       12 |
+| Alice Mutton                     |   39.0000 |       10 |
+| Alice Mutton                     |   39.0000 |       15 |
+| Alice Mutton                     |   39.0000 |        6 |
+| Alice Mutton                     |   39.0000 |        6 |
+| Alice Mutton                     |   39.0000 |       12 |
+| Alice Mutton                     |   39.0000 |       77 |
+| Aniseed Syrup                    |    8.0000 |       30 |
+| Aniseed Syrup                    |    8.0000 |       50 |
+| Aniseed Syrup                    |    8.0000 |       20 |
+| Aniseed Syrup                    |   10.0000 |       60 |
+| Aniseed Syrup                    |   10.0000 |       14 |
+| Aniseed Syrup                    |   10.0000 |        6 |
+| Aniseed Syrup                    |   10.0000 |       20 |
+| Aniseed Syrup                    |   10.0000 |       20 |
+| Aniseed Syrup                    |   10.0000 |       49 |
+| Aniseed Syrup                    |   10.0000 |       30 |
+| Aniseed Syrup                    |   10.0000 |       25 |
+| Aniseed Syrup                    |   10.0000 |        4 |
+| Boston Crab Meat                 |   14.7000 |       50 |
+| Boston Crab Meat                 |   14.7000 |       60 |
+| Boston Crab Meat                 |   14.7000 |       40 |
+| Boston Crab Meat                 |   14.7000 |       10 |
+| Boston Crab Meat                 |   14.7000 |       40 |
+| Boston Crab Meat                 |   14.7000 |        4 |
+| Boston Crab Meat                 |   14.7000 |        2 |
+| Boston Crab Meat                 |   14.7000 |       50 |
+| Boston Crab Meat                 |   14.7000 |       20 |
+| Boston Crab Meat                 |   14.7000 |       20 |
+| Boston Crab Meat                 |   14.7000 |       21 |
+| Boston Crab Meat                 |   14.7000 |       10 |
+| Boston Crab Meat                 |   14.7000 |       10 |
+| Boston Crab Meat                 |   18.4000 |        5 |
+| Boston Crab Meat                 |   18.4000 |       25 |
+| Boston Crab Meat                 |   18.4000 |       15 |
+| Boston Crab Meat                 |   18.4000 |       10 |
+| Boston Crab Meat                 |   18.4000 |       10 |
+| Boston Crab Meat                 |   18.4000 |       50 |
+| Boston Crab Meat                 |   18.4000 |        2 |
+| Boston Crab Meat                 |   18.4000 |       42 |
+| Boston Crab Meat                 |   18.4000 |       60 |
+| Boston Crab Meat                 |   18.4000 |       70 |
+| Boston Crab Meat                 |   18.4000 |       24 |
+| Boston Crab Meat                 |   18.4000 |       30 |
+| Boston Crab Meat                 |   18.4000 |       20 |
+| Boston Crab Meat                 |   18.4000 |        6 |
+| Boston Crab Meat                 |   18.4000 |       50 |
+| Boston Crab Meat                 |   18.4000 |       40 |
+| Boston Crab Meat                 |   18.4000 |        3 |
+| Boston Crab Meat                 |   18.4000 |        1 |
+| Boston Crab Meat                 |   18.4000 |       30 |
+| Boston Crab Meat                 |   18.4000 |       60 |
+| Boston Crab Meat                 |   18.4000 |       25 |
+| Boston Crab Meat                 |   18.4000 |       12 |
+| Boston Crab Meat                 |   18.4000 |       91 |
+| Boston Crab Meat                 |   18.4000 |       20 |
+| Boston Crab Meat                 |   18.4000 |       10 |
+| Boston Crab Meat                 |   18.4000 |       10 |
+| Boston Crab Meat                 |   18.4000 |        5 |
+| Boston Crab Meat                 |   18.4000 |       40 |
+| Camembert Pierrot                |   27.2000 |       40 |
+| Camembert Pierrot                |   27.2000 |       35 |
+| Camembert Pierrot                |   27.2000 |       20 |
+| Camembert Pierrot                |   27.2000 |       21 |
+| Camembert Pierrot                |   27.2000 |        8 |
+| Camembert Pierrot                |   27.2000 |       80 |
+| Camembert Pierrot                |   27.2000 |       55 |
+| Camembert Pierrot                |   27.2000 |       70 |
+| Camembert Pierrot                |   27.2000 |        6 |
+| Camembert Pierrot                |   27.2000 |       15 |
+| Camembert Pierrot                |   27.2000 |       20 |
+| Camembert Pierrot                |   27.2000 |       60 |
+| Camembert Pierrot                |   27.2000 |       20 |
+| Camembert Pierrot                |   27.2000 |       40 |
+| Camembert Pierrot                |   34.0000 |       12 |
+| Camembert Pierrot                |   34.0000 |       84 |
+| Camembert Pierrot                |   34.0000 |       10 |
+| Camembert Pierrot                |   34.0000 |       35 |
+| Camembert Pierrot                |   34.0000 |       24 |
+| Camembert Pierrot                |   34.0000 |       70 |
+| Camembert Pierrot                |   34.0000 |       15 |
+| Camembert Pierrot                |   34.0000 |       40 |
+| Camembert Pierrot                |   34.0000 |       10 |
+| Camembert Pierrot                |   34.0000 |       20 |
+| Camembert Pierrot                |   34.0000 |       20 |
+| Camembert Pierrot                |   34.0000 |       30 |
+| Camembert Pierrot                |   34.0000 |       55 |
+| Camembert Pierrot                |   34.0000 |       30 |
+| Camembert Pierrot                |   34.0000 |       10 |
+| Camembert Pierrot                |   34.0000 |       15 |
+| Camembert Pierrot                |   34.0000 |       50 |
+| Camembert Pierrot                |   34.0000 |       15 |
+| Camembert Pierrot                |   34.0000 |       21 |
+| Camembert Pierrot                |   34.0000 |       30 |
+| Camembert Pierrot                |   34.0000 |       60 |
+| Camembert Pierrot                |   34.0000 |       45 |
+| Camembert Pierrot                |   34.0000 |      100 |
+| Camembert Pierrot                |   34.0000 |       10 |
+| Camembert Pierrot                |   34.0000 |       25 |
+| Camembert Pierrot                |   34.0000 |       49 |
+| Camembert Pierrot                |   34.0000 |       24 |
+| Camembert Pierrot                |   34.0000 |        2 |
+| Camembert Pierrot                |   34.0000 |        4 |
+| Camembert Pierrot                |   34.0000 |        9 |
+| Camembert Pierrot                |   34.0000 |       36 |
+| Camembert Pierrot                |   34.0000 |       50 |
+| Camembert Pierrot                |   34.0000 |       21 |
+| Camembert Pierrot                |   34.0000 |       35 |
+| Camembert Pierrot                |   34.0000 |        4 |
+| Camembert Pierrot                |   34.0000 |       15 |
+| Camembert Pierrot                |   34.0000 |        2 |
+| Carnarvon Tigers                 |   50.0000 |       12 |
+| Carnarvon Tigers                 |   50.0000 |       25 |
+| Carnarvon Tigers                 |   50.0000 |       40 |
+| Carnarvon Tigers                 |   50.0000 |       20 |
+| Carnarvon Tigers                 |   50.0000 |        9 |
+| Carnarvon Tigers                 |   50.0000 |       30 |
+| Carnarvon Tigers                 |   62.5000 |       25 |
+| Carnarvon Tigers                 |   62.5000 |       18 |
+| Carnarvon Tigers                 |   62.5000 |       40 |
+| Carnarvon Tigers                 |   62.5000 |       50 |
+| Carnarvon Tigers                 |   62.5000 |        8 |
+| Carnarvon Tigers                 |   62.5000 |        4 |
+| Carnarvon Tigers                 |   62.5000 |       20 |
+| Carnarvon Tigers                 |   62.5000 |       12 |
+| Carnarvon Tigers                 |   62.5000 |       24 |
+| Carnarvon Tigers                 |   62.5000 |       21 |
+| Carnarvon Tigers                 |   62.5000 |       30 |
+| Carnarvon Tigers                 |   62.5000 |       25 |
+| Carnarvon Tigers                 |   62.5000 |       10 |
+| Carnarvon Tigers                 |   62.5000 |       20 |
+| Carnarvon Tigers                 |   62.5000 |       25 |
+| Carnarvon Tigers                 |   62.5000 |        4 |
+| Carnarvon Tigers                 |   62.5000 |        6 |
+| Carnarvon Tigers                 |   62.5000 |        8 |
+| Carnarvon Tigers                 |   62.5000 |       10 |
+| Carnarvon Tigers                 |   62.5000 |        8 |
+| Carnarvon Tigers                 |   62.5000 |       35 |
+| Chai                             |   14.4000 |       45 |
+| Chai                             |   14.4000 |       18 |
+| Chai                             |   14.4000 |       20 |
+| Chai                             |   14.4000 |       15 |
+| Chai                             |   14.4000 |       12 |
+| Chai                             |   14.4000 |       15 |
+| Chai                             |   14.4000 |       10 |
+| Chai                             |   14.4000 |       24 |
+| Chai                             |   14.4000 |       15 |
+| Chai                             |   18.0000 |       40 |
+| Chai                             |   18.0000 |        8 |
+| Chai                             |   18.0000 |       10 |
+| Chai                             |   18.0000 |       20 |
+| Chai                             |   18.0000 |        3 |
+| Chai                             |   18.0000 |        6 |
+| Chai                             |   18.0000 |       25 |
+| Chai                             |   18.0000 |       15 |
+| Chai                             |   18.0000 |       35 |
+| Chai                             |   18.0000 |       30 |
+| Chai                             |   18.0000 |        5 |
+| Chai                             |   18.0000 |       50 |
+| Chai                             |   18.0000 |        8 |
+| Chai                             |   18.0000 |        4 |
+| Chai                             |   18.0000 |       80 |
+| Chai                             |   18.0000 |       20 |
+| Chai                             |   18.0000 |       40 |
+| Chai                             |   18.0000 |       20 |
+| Chai                             |   18.0000 |       10 |
+| Chai                             |   18.0000 |       60 |
+| Chai                             |   18.0000 |       21 |
+| Chai                             |   18.0000 |        4 |
+| Chai                             |   18.0000 |        2 |
+| Chai                             |   18.0000 |        8 |
+| Chai                             |   18.0000 |       10 |
+| Chai                             |   18.0000 |       45 |
+| Chai                             |   18.0000 |       10 |
+| Chai                             |   18.0000 |       25 |
+| Chai                             |   18.0000 |       40 |
+| Chang                            |   15.2000 |       20 |
+| Chang                            |   15.2000 |       50 |
+| Chang                            |   15.2000 |       35 |
+| Chang                            |   15.2000 |       40 |
+| Chang                            |   15.2000 |       25 |
+| Chang                            |   15.2000 |        7 |
+| Chang                            |   15.2000 |       24 |
+| Chang                            |   15.2000 |       25 |
+| Chang                            |   15.2000 |       60 |
+| Chang                            |   15.2000 |       10 |
+| Chang                            |   15.2000 |       45 |
+| Chang                            |   15.2000 |       40 |
+| Chang                            |   15.2000 |       20 |
+| Chang                            |   19.0000 |       12 |
+| Chang                            |   19.0000 |       10 |
+| Chang                            |   19.0000 |       20 |
+| Chang                            |   19.0000 |       30 |
+| Chang                            |   19.0000 |       50 |
+| Chang                            |   19.0000 |        5 |
+| Chang                            |   19.0000 |       30 |
+| Chang                            |   19.0000 |        3 |
+| Chang                            |   19.0000 |       15 |
+| Chang                            |   19.0000 |       40 |
+| Chang                            |   19.0000 |       15 |
+| Chang                            |   19.0000 |       10 |
+| Chang                            |   19.0000 |       20 |
+| Chang                            |   19.0000 |       12 |
+| Chang                            |   19.0000 |       10 |
+| Chang                            |   19.0000 |        5 |
+| Chang                            |   19.0000 |       15 |
+| Chang                            |   19.0000 |       20 |
+| Chang                            |   19.0000 |       21 |
+| Chang                            |   19.0000 |       20 |
+| Chang                            |   19.0000 |       20 |
+| Chang                            |   19.0000 |       10 |
+| Chang                            |   19.0000 |       50 |
+| Chang                            |   19.0000 |       11 |
+| Chang                            |   19.0000 |      100 |
+| Chang                            |   19.0000 |       30 |
+| Chang                            |   19.0000 |       10 |
+| Chang                            |   19.0000 |       20 |
+| Chang                            |   19.0000 |        8 |
+| Chang                            |   19.0000 |       10 |
+| Chang                            |   19.0000 |       24 |
+| Chartreuse verte                 |   14.4000 |       42 |
+| Chartreuse verte                 |   14.4000 |        6 |
+| Chartreuse verte                 |   14.4000 |       60 |
+| Chartreuse verte                 |   14.4000 |       30 |
+| Chartreuse verte                 |   14.4000 |        4 |
+| Chartreuse verte                 |   14.4000 |       50 |
+| Chartreuse verte                 |   14.4000 |       54 |
+| Chartreuse verte                 |   14.4000 |       20 |
+| Chartreuse verte                 |   14.4000 |        6 |
+| Chartreuse verte                 |   14.4000 |       20 |
+| Chartreuse verte                 |   14.4000 |       20 |
+| Chartreuse verte                 |   18.0000 |       10 |
+| Chartreuse verte                 |   18.0000 |       10 |
+| Chartreuse verte                 |   18.0000 |        5 |
+| Chartreuse verte                 |   18.0000 |       21 |
+| Chartreuse verte                 |   18.0000 |       20 |
+| Chartreuse verte                 |   18.0000 |       20 |
+| Chartreuse verte                 |   18.0000 |        3 |
+| Chartreuse verte                 |   18.0000 |       16 |
+| Chartreuse verte                 |   18.0000 |      130 |
+| Chartreuse verte                 |   18.0000 |        2 |
+| Chartreuse verte                 |   18.0000 |       21 |
+| Chartreuse verte                 |   18.0000 |       28 |
+| Chartreuse verte                 |   18.0000 |       10 |
+| Chartreuse verte                 |   18.0000 |       80 |
+| Chartreuse verte                 |   18.0000 |       45 |
+| Chartreuse verte                 |   18.0000 |        8 |
+| Chartreuse verte                 |   18.0000 |       30 |
+| Chartreuse verte                 |   18.0000 |       20 |
+| Chartreuse verte                 |   18.0000 |        2 |
+| Chef Anton's Cajun Seasoning     |   17.6000 |       20 |
+| Chef Anton's Cajun Seasoning     |   17.6000 |       24 |
+| Chef Anton's Cajun Seasoning     |   17.6000 |       18 |
+| Chef Anton's Cajun Seasoning     |   17.6000 |       10 |
+| Chef Anton's Cajun Seasoning     |   17.6000 |       35 |
+| Chef Anton's Cajun Seasoning     |   17.6000 |       16 |
+| Chef Anton's Cajun Seasoning     |   22.0000 |       50 |
+| Chef Anton's Cajun Seasoning     |   22.0000 |       50 |
+| Chef Anton's Cajun Seasoning     |   22.0000 |       50 |
+| Chef Anton's Cajun Seasoning     |   22.0000 |       20 |
+| Chef Anton's Cajun Seasoning     |   22.0000 |       10 |
+| Chef Anton's Cajun Seasoning     |   22.0000 |       25 |
+| Chef Anton's Cajun Seasoning     |   22.0000 |       12 |
+| Chef Anton's Cajun Seasoning     |   22.0000 |        6 |
+| Chef Anton's Cajun Seasoning     |   22.0000 |       25 |
+| Chef Anton's Cajun Seasoning     |   22.0000 |       21 |
+| Chef Anton's Cajun Seasoning     |   22.0000 |       30 |
+| Chef Anton's Cajun Seasoning     |   22.0000 |        5 |
+| Chef Anton's Cajun Seasoning     |   22.0000 |       25 |
+| Chef Anton's Cajun Seasoning     |   22.0000 |        1 |
+| Chef Anton's Gumbo Mix           |   17.0000 |       65 |
+| Chef Anton's Gumbo Mix           |   17.0000 |       12 |
+| Chef Anton's Gumbo Mix           |   17.0000 |       20 |
+| Chef Anton's Gumbo Mix           |   17.0000 |       32 |
+| Chef Anton's Gumbo Mix           |   21.3500 |       15 |
+| Chef Anton's Gumbo Mix           |   21.3500 |        4 |
+| Chef Anton's Gumbo Mix           |   21.3500 |       30 |
+| Chef Anton's Gumbo Mix           |   21.3500 |       20 |
+| Chef Anton's Gumbo Mix           |   21.3500 |       70 |
+| Chef Anton's Gumbo Mix           |   21.3500 |       30 |
+| Chocolade                        |   10.2000 |       70 |
+| Chocolade                        |   10.2000 |       15 |
+| Chocolade                        |   12.7500 |       15 |
+| Chocolade                        |   12.7500 |        6 |
+| Chocolade                        |   12.7500 |       24 |
+| Chocolade                        |   12.7500 |        8 |
+| Cte de Blaye                     |  210.8000 |       20 |
+| Cte de Blaye                     |  210.8000 |       20 |
+| Cte de Blaye                     |  210.8000 |       50 |
+| Cte de Blaye                     |  210.8000 |       10 |
+| Cte de Blaye                     |  210.8000 |       40 |
+| Cte de Blaye                     |  210.8000 |       50 |
+| Cte de Blaye                     |  210.8000 |       49 |
+| Cte de Blaye                     |  210.8000 |       30 |
+| Cte de Blaye                     |  263.5000 |       15 |
+| Cte de Blaye                     |  263.5000 |       30 |
+| Cte de Blaye                     |  263.5000 |        4 |
+| Cte de Blaye                     |  263.5000 |       15 |
+| Cte de Blaye                     |  263.5000 |       15 |
+| Cte de Blaye                     |  263.5000 |        5 |
+| Cte de Blaye                     |  263.5000 |       10 |
+| Cte de Blaye                     |  263.5000 |       30 |
+| Cte de Blaye                     |  263.5000 |       30 |
+| Cte de Blaye                     |  263.5000 |        2 |
+| Cte de Blaye                     |  263.5000 |        8 |
+| Cte de Blaye                     |  263.5000 |       60 |
+| Cte de Blaye                     |  263.5000 |       40 |
+| Cte de Blaye                     |  263.5000 |        5 |
+| Cte de Blaye                     |  263.5000 |       60 |
+| Cte de Blaye                     |  263.5000 |       25 |
+| Escargots de Bourgogne           |   10.6000 |       30 |
+| Escargots de Bourgogne           |   10.6000 |       30 |
+| Escargots de Bourgogne           |   10.6000 |       80 |
+| Escargots de Bourgogne           |   10.6000 |       15 |
+| Escargots de Bourgogne           |   13.2500 |       20 |
+| Escargots de Bourgogne           |   13.2500 |       30 |
+| Escargots de Bourgogne           |   13.2500 |        6 |
+| Escargots de Bourgogne           |   13.2500 |       49 |
+| Escargots de Bourgogne           |   13.2500 |       30 |
+| Escargots de Bourgogne           |   13.2500 |       30 |
+| Escargots de Bourgogne           |   13.2500 |       12 |
+| Escargots de Bourgogne           |   13.2500 |       30 |
+| Escargots de Bourgogne           |   13.2500 |       60 |
+| Escargots de Bourgogne           |   13.2500 |       12 |
+| Escargots de Bourgogne           |   13.2500 |       15 |
+| Escargots de Bourgogne           |   13.2500 |       15 |
+| Escargots de Bourgogne           |   13.2500 |       30 |
+| Escargots de Bourgogne           |   13.2500 |       40 |
+| Filo Mix                         |    5.6000 |       20 |
+| Filo Mix                         |    5.6000 |        8 |
+| Filo Mix                         |    5.6000 |       20 |
+| Filo Mix                         |    5.6000 |       15 |
+| Filo Mix                         |    5.6000 |       20 |
+| Filo Mix                         |    7.0000 |        6 |
+| Filo Mix                         |    7.0000 |       30 |
+| Filo Mix                         |    7.0000 |       70 |
+| Filo Mix                         |    7.0000 |        4 |
+| Filo Mix                         |    7.0000 |       24 |
+| Filo Mix                         |    7.0000 |        5 |
+| Filo Mix                         |    7.0000 |        9 |
+| Filo Mix                         |    7.0000 |        4 |
+| Filo Mix                         |    7.0000 |       25 |
+| Filo Mix                         |    7.0000 |       18 |
+| Filo Mix                         |    7.0000 |       60 |
+| Filo Mix                         |    7.0000 |       15 |
+| Filo Mix                         |    7.0000 |        8 |
+| Filo Mix                         |    7.0000 |       20 |
+| Filo Mix                         |    7.0000 |        8 |
+| Filo Mix                         |    7.0000 |       14 |
+| Filo Mix                         |    7.0000 |       12 |
+| Filo Mix                         |    7.0000 |        5 |
+| Filo Mix                         |    7.0000 |        6 |
+| Filo Mix                         |    7.0000 |       40 |
+| Filo Mix                         |    7.0000 |       20 |
+| Filo Mix                         |    7.0000 |       10 |
+| Filo Mix                         |    7.0000 |        2 |
+| Filo Mix                         |    7.0000 |        2 |
+| Flotemysost                      |   17.2000 |       20 |
+| Flotemysost                      |   17.2000 |        2 |
+| Flotemysost                      |   17.2000 |        3 |
+| Flotemysost                      |   17.2000 |       30 |
+| Flotemysost                      |   17.2000 |       40 |
+| Flotemysost                      |   17.2000 |        5 |
+| Flotemysost                      |   17.2000 |       50 |
+| Flotemysost                      |   17.2000 |        6 |
+| Flotemysost                      |   17.2000 |       15 |
+| Flotemysost                      |   17.2000 |       60 |
+| Flotemysost                      |   17.2000 |       30 |
+| Flotemysost                      |   17.2000 |       60 |
+| Flotemysost                      |   17.2000 |       15 |
+| Flotemysost                      |   17.2000 |        2 |
+| Flotemysost                      |   17.2000 |       30 |
+| Flotemysost                      |   17.2000 |       50 |
+| Flotemysost                      |   17.2000 |       12 |
+| Flotemysost                      |   21.5000 |        9 |
+| Flotemysost                      |   21.5000 |        9 |
+| Flotemysost                      |   21.5000 |       15 |
+| Flotemysost                      |   21.5000 |       15 |
+| Flotemysost                      |   21.5000 |       15 |
+| Flotemysost                      |   21.5000 |       20 |
+| Flotemysost                      |   21.5000 |       30 |
+| Flotemysost                      |   21.5000 |       14 |
+| Flotemysost                      |   21.5000 |       12 |
+| Flotemysost                      |   21.5000 |       60 |
+| Flotemysost                      |   21.5000 |       20 |
+| Flotemysost                      |   21.5000 |       30 |
+| Flotemysost                      |   21.5000 |        8 |
+| Flotemysost                      |   21.5000 |       12 |
+| Flotemysost                      |   21.5000 |       16 |
+| Flotemysost                      |   21.5000 |       55 |
+| Flotemysost                      |   21.5000 |       30 |
+| Flotemysost                      |   21.5000 |       25 |
+| Flotemysost                      |   21.5000 |       35 |
+| Flotemysost                      |   21.5000 |       21 |
+| Flotemysost                      |   21.5000 |       20 |
+| Flotemysost                      |   21.5000 |       60 |
+| Flotemysost                      |   21.5000 |       50 |
+| Flotemysost                      |   21.5000 |       16 |
+| Flotemysost                      |   21.5000 |       30 |
+| Geitost                          |    2.0000 |       25 |
+| Geitost                          |    2.0000 |       60 |
+| Geitost                          |    2.0000 |       24 |
+| Geitost                          |    2.0000 |       20 |
+| Geitost                          |    2.0000 |        8 |
+| Geitost                          |    2.0000 |       60 |
+| Geitost                          |    2.0000 |       49 |
+| Geitost                          |    2.0000 |       50 |
+| Geitost                          |    2.0000 |       20 |
+| Geitost                          |    2.0000 |       20 |
+| Geitost                          |    2.0000 |       12 |
+| Geitost                          |    2.5000 |       16 |
+| Geitost                          |    2.5000 |        8 |
+| Geitost                          |    2.5000 |       30 |
+| Geitost                          |    2.5000 |       15 |
+| Geitost                          |    2.5000 |       20 |
+| Geitost                          |    2.5000 |       14 |
+| Geitost                          |    2.5000 |       14 |
+| Geitost                          |    2.5000 |       20 |
+| Geitost                          |    2.5000 |        8 |
+| Geitost                          |    2.5000 |       30 |
+| Geitost                          |    2.5000 |       30 |
+| Geitost                          |    2.5000 |       16 |
+| Geitost                          |    2.5000 |        4 |
+| Geitost                          |    2.5000 |       35 |
+| Geitost                          |    2.5000 |       40 |
+| Geitost                          |    2.5000 |       30 |
+| Geitost                          |    2.5000 |       15 |
+| Geitost                          |    2.5000 |        7 |
+| Geitost                          |    2.5000 |       30 |
+| Geitost                          |    2.5000 |       15 |
+| Geitost                          |    2.5000 |       10 |
+| Genen Shouyu                     |   12.4000 |       20 |
+| Genen Shouyu                     |   12.4000 |        5 |
+| Genen Shouyu                     |   15.5000 |       12 |
+| Genen Shouyu                     |   15.5000 |       10 |
+| Genen Shouyu                     |   15.5000 |       25 |
+| Genen Shouyu                     |   15.5000 |       50 |
+| Gnocchi di nonna Alice           |   30.4000 |        2 |
+| Gnocchi di nonna Alice           |   30.4000 |        4 |
+| Gnocchi di nonna Alice           |   30.4000 |       20 |
+| Gnocchi di nonna Alice           |   30.4000 |       12 |
+| Gnocchi di nonna Alice           |   30.4000 |       20 |
+| Gnocchi di nonna Alice           |   30.4000 |       18 |
+| Gnocchi di nonna Alice           |   30.4000 |       20 |
+| Gnocchi di nonna Alice           |   30.4000 |       70 |
+| Gnocchi di nonna Alice           |   30.4000 |        5 |
+| Gnocchi di nonna Alice           |   30.4000 |       30 |
+| Gnocchi di nonna Alice           |   30.4000 |       28 |
+| Gnocchi di nonna Alice           |   30.4000 |       40 |
+| Gnocchi di nonna Alice           |   30.4000 |       15 |
+| Gnocchi di nonna Alice           |   30.4000 |       30 |
+| Gnocchi di nonna Alice           |   30.4000 |       20 |
+| Gnocchi di nonna Alice           |   30.4000 |       30 |
+| Gnocchi di nonna Alice           |   30.4000 |       14 |
+| Gnocchi di nonna Alice           |   38.0000 |       70 |
+| Gnocchi di nonna Alice           |   38.0000 |       40 |
+| Gnocchi di nonna Alice           |   38.0000 |       30 |
+| Gnocchi di nonna Alice           |   38.0000 |       40 |
+| Gnocchi di nonna Alice           |   38.0000 |       60 |
+| Gnocchi di nonna Alice           |   38.0000 |        5 |
+| Gnocchi di nonna Alice           |   38.0000 |       28 |
+| Gnocchi di nonna Alice           |   38.0000 |       14 |
+| Gnocchi di nonna Alice           |   38.0000 |       20 |
+| Gnocchi di nonna Alice           |   38.0000 |       60 |
+| Gnocchi di nonna Alice           |   38.0000 |       45 |
+| Gnocchi di nonna Alice           |   38.0000 |       12 |
+| Gnocchi di nonna Alice           |   38.0000 |       20 |
+| Gnocchi di nonna Alice           |   38.0000 |       30 |
+| Gnocchi di nonna Alice           |   38.0000 |       18 |
+| Gnocchi di nonna Alice           |   38.0000 |       10 |
+| Gnocchi di nonna Alice           |   38.0000 |       14 |
+| Gnocchi di nonna Alice           |   38.0000 |       28 |
+| Gnocchi di nonna Alice           |   38.0000 |       15 |
+| Gnocchi di nonna Alice           |   38.0000 |       30 |
+| Gnocchi di nonna Alice           |   38.0000 |       60 |
+| Gnocchi di nonna Alice           |   38.0000 |       20 |
+| Gnocchi di nonna Alice           |   38.0000 |       20 |
+| Gnocchi di nonna Alice           |   38.0000 |       20 |
+| Gnocchi di nonna Alice           |   38.0000 |       30 |
+| Gnocchi di nonna Alice           |   38.0000 |       30 |
+| Gnocchi di nonna Alice           |   38.0000 |       24 |
+| Gnocchi di nonna Alice           |   38.0000 |       21 |
+| Gnocchi di nonna Alice           |   38.0000 |       16 |
+| Gnocchi di nonna Alice           |   38.0000 |       18 |
+| Gnocchi di nonna Alice           |   38.0000 |       12 |
+| Gnocchi di nonna Alice           |   38.0000 |        5 |
+| Gnocchi di nonna Alice           |   38.0000 |       20 |
+| Gorgonzola Telino                |   10.0000 |       20 |
+| Gorgonzola Telino                |   10.0000 |       40 |
+| Gorgonzola Telino                |   10.0000 |       15 |
+| Gorgonzola Telino                |   10.0000 |        4 |
+| Gorgonzola Telino                |   10.0000 |       25 |
+| Gorgonzola Telino                |   10.0000 |       56 |
+| Gorgonzola Telino                |   10.0000 |       30 |
+| Gorgonzola Telino                |   10.0000 |       70 |
+| Gorgonzola Telino                |   10.0000 |       20 |
+| Gorgonzola Telino                |   10.0000 |       30 |
+| Gorgonzola Telino                |   10.0000 |       42 |
+| Gorgonzola Telino                |   10.0000 |       60 |
+| Gorgonzola Telino                |   10.0000 |       32 |
+| Gorgonzola Telino                |   10.0000 |       14 |
+| Gorgonzola Telino                |   10.0000 |        3 |
+| Gorgonzola Telino                |   10.0000 |       35 |
+| Gorgonzola Telino                |   10.0000 |       20 |
+| Gorgonzola Telino                |   12.5000 |       20 |
+| Gorgonzola Telino                |   12.5000 |       30 |
+| Gorgonzola Telino                |   12.5000 |       55 |
+| Gorgonzola Telino                |   12.5000 |       30 |
+| Gorgonzola Telino                |   12.5000 |        6 |
+| Gorgonzola Telino                |   12.5000 |       60 |
+| Gorgonzola Telino                |   12.5000 |       35 |
+| Gorgonzola Telino                |   12.5000 |       20 |
+| Gorgonzola Telino                |   12.5000 |       50 |
+| Gorgonzola Telino                |   12.5000 |       20 |
+| Gorgonzola Telino                |   12.5000 |        8 |
+| Gorgonzola Telino                |   12.5000 |       20 |
+| Gorgonzola Telino                |   12.5000 |       20 |
+| Gorgonzola Telino                |   12.5000 |       50 |
+| Gorgonzola Telino                |   12.5000 |        3 |
+| Gorgonzola Telino                |   12.5000 |        8 |
+| Gorgonzola Telino                |   12.5000 |       50 |
+| Gorgonzola Telino                |   12.5000 |       70 |
+| Gorgonzola Telino                |   12.5000 |        2 |
+| Gorgonzola Telino                |   12.5000 |       16 |
+| Gorgonzola Telino                |   12.5000 |        1 |
+| Gorgonzola Telino                |   12.5000 |       10 |
+| Gorgonzola Telino                |   12.5000 |       16 |
+| Gorgonzola Telino                |   12.5000 |       35 |
+| Gorgonzola Telino                |   12.5000 |        9 |
+| Gorgonzola Telino                |   12.5000 |       14 |
+| Gorgonzola Telino                |   12.5000 |       35 |
+| Gorgonzola Telino                |   12.5000 |       44 |
+| Gorgonzola Telino                |   12.5000 |       10 |
+| Gorgonzola Telino                |   12.5000 |       50 |
+| Gorgonzola Telino                |   12.5000 |       25 |
+| Gorgonzola Telino                |   12.5000 |       24 |
+| Gorgonzola Telino                |   12.5000 |       15 |
+| Gorgonzola Telino                |   12.5000 |       20 |
+| Grandma's Boysenberry Spread     |   20.0000 |       30 |
+| Grandma's Boysenberry Spread     |   20.0000 |        6 |
+| Grandma's Boysenberry Spread     |   25.0000 |       70 |
+| Grandma's Boysenberry Spread     |   25.0000 |       30 |
+| Grandma's Boysenberry Spread     |   25.0000 |        6 |
+| Grandma's Boysenberry Spread     |   25.0000 |       50 |
+| Grandma's Boysenberry Spread     |   25.0000 |       20 |
+| Grandma's Boysenberry Spread     |   25.0000 |       12 |
+| Grandma's Boysenberry Spread     |   25.0000 |       16 |
+| Grandma's Boysenberry Spread     |   25.0000 |       40 |
+| Grandma's Boysenberry Spread     |   25.0000 |       20 |
+| Grandma's Boysenberry Spread     |   25.0000 |        1 |
+| Gravad lax                       |   20.8000 |        1 |
+| Gravad lax                       |   20.8000 |       28 |
+| Gravad lax                       |   20.8000 |       10 |
+| Gravad lax                       |   26.0000 |       18 |
+| Gravad lax                       |   26.0000 |       60 |
+| Gravad lax                       |   26.0000 |        8 |
+| Guaran Fantstica                 |    3.6000 |       15 |
+| Guaran Fantstica                 |    3.6000 |       28 |
+| Guaran Fantstica                 |    3.6000 |       12 |
+| Guaran Fantstica                 |    3.6000 |       12 |
+| Guaran Fantstica                 |    3.6000 |        6 |
+| Guaran Fantstica                 |    3.6000 |       10 |
+| Guaran Fantstica                 |    3.6000 |       10 |
+| Guaran Fantstica                 |    3.6000 |       25 |
+| Guaran Fantstica                 |    3.6000 |       10 |
+| Guaran Fantstica                 |    3.6000 |       15 |
+| Guaran Fantstica                 |    3.6000 |       15 |
+| Guaran Fantstica                 |    3.6000 |       20 |
+| Guaran Fantstica                 |    3.6000 |       25 |
+| Guaran Fantstica                 |    3.6000 |       28 |
+| Guaran Fantstica                 |    3.6000 |       80 |
+| Guaran Fantstica                 |    4.5000 |       14 |
+| Guaran Fantstica                 |    4.5000 |       10 |
+| Guaran Fantstica                 |    4.5000 |        5 |
+| Guaran Fantstica                 |    4.5000 |        8 |
+| Guaran Fantstica                 |    4.5000 |       35 |
+| Guaran Fantstica                 |    4.5000 |       18 |
+| Guaran Fantstica                 |    4.5000 |       25 |
+| Guaran Fantstica                 |    4.5000 |       35 |
+| Guaran Fantstica                 |    4.5000 |        5 |
+| Guaran Fantstica                 |    4.5000 |        3 |
+| Guaran Fantstica                 |    4.5000 |       15 |
+| Guaran Fantstica                 |    4.5000 |       20 |
+| Guaran Fantstica                 |    4.5000 |       35 |
+| Guaran Fantstica                 |    4.5000 |       20 |
+| Guaran Fantstica                 |    4.5000 |       20 |
+| Guaran Fantstica                 |    4.5000 |       40 |
+| Guaran Fantstica                 |    4.5000 |        6 |
+| Guaran Fantstica                 |    4.5000 |        8 |
+| Guaran Fantstica                 |    4.5000 |       12 |
+| Guaran Fantstica                 |    4.5000 |       10 |
+| Guaran Fantstica                 |    4.5000 |      110 |
+| Guaran Fantstica                 |    4.5000 |       35 |
+| Guaran Fantstica                 |    4.5000 |       25 |
+| Guaran Fantstica                 |    4.5000 |       10 |
+| Guaran Fantstica                 |    4.5000 |       30 |
+| Guaran Fantstica                 |    4.5000 |       80 |
+| Guaran Fantstica                 |    4.5000 |       20 |
+| Guaran Fantstica                 |    4.5000 |       12 |
+| Guaran Fantstica                 |    4.5000 |       30 |
+| Guaran Fantstica                 |    4.5000 |       12 |
+| Guaran Fantstica                 |    4.5000 |       10 |
+| Guaran Fantstica                 |    4.5000 |       30 |
+| Guaran Fantstica                 |    4.5000 |       21 |
+| Guaran Fantstica                 |    4.5000 |       10 |
+| Guaran Fantstica                 |    4.5000 |       15 |
+| Guaran Fantstica                 |    4.5000 |       20 |
+| Gudbrandsdalsost                 |   28.8000 |       15 |
+| Gudbrandsdalsost                 |   28.8000 |        1 |
+| Gudbrandsdalsost                 |   28.8000 |        7 |
+| Gudbrandsdalsost                 |   28.8000 |       18 |
+| Gudbrandsdalsost                 |   28.8000 |       20 |
+| Gudbrandsdalsost                 |   28.8000 |       30 |
+| Gudbrandsdalsost                 |   28.8000 |       50 |
+| Gudbrandsdalsost                 |   28.8000 |        8 |
+| Gudbrandsdalsost                 |   28.8000 |       15 |
+| Gudbrandsdalsost                 |   28.8000 |       20 |
+| Gudbrandsdalsost                 |   28.8000 |       10 |
+| Gudbrandsdalsost                 |   36.0000 |       10 |
+| Gudbrandsdalsost                 |   36.0000 |       18 |
+| Gudbrandsdalsost                 |   36.0000 |       10 |
+| Gudbrandsdalsost                 |   36.0000 |       20 |
+| Gudbrandsdalsost                 |   36.0000 |       65 |
+| Gudbrandsdalsost                 |   36.0000 |       20 |
+| Gudbrandsdalsost                 |   36.0000 |       45 |
+| Gudbrandsdalsost                 |   36.0000 |       30 |
+| Gudbrandsdalsost                 |   36.0000 |       25 |
+| Gudbrandsdalsost                 |   36.0000 |       40 |
+| Gudbrandsdalsost                 |   36.0000 |       30 |
+| Gudbrandsdalsost                 |   36.0000 |        3 |
+| Gudbrandsdalsost                 |   36.0000 |       25 |
+| Gudbrandsdalsost                 |   36.0000 |       20 |
+| Gudbrandsdalsost                 |   36.0000 |       24 |
+| Gudbrandsdalsost                 |   36.0000 |       50 |
+| Gudbrandsdalsost                 |   36.0000 |        9 |
+| Gudbrandsdalsost                 |   36.0000 |       10 |
+| Gudbrandsdalsost                 |   36.0000 |       30 |
+| Gudbrandsdalsost                 |   36.0000 |       36 |
+| Gula Malacca                     |   15.5000 |       16 |
+| Gula Malacca                     |   15.5000 |       21 |
+| Gula Malacca                     |   15.5000 |       24 |
+| Gula Malacca                     |   15.5000 |       77 |
+| Gula Malacca                     |   15.5000 |       40 |
+| Gula Malacca                     |   15.5000 |      100 |
+| Gula Malacca                     |   15.5000 |        2 |
+| Gula Malacca                     |   15.5000 |       15 |
+| Gula Malacca                     |   19.4500 |        9 |
+| Gula Malacca                     |   19.4500 |       40 |
+| Gula Malacca                     |   19.4500 |       10 |
+| Gula Malacca                     |   19.4500 |       21 |
+| Gula Malacca                     |   19.4500 |       10 |
+| Gula Malacca                     |   19.4500 |       28 |
+| Gula Malacca                     |   19.4500 |       21 |
+| Gula Malacca                     |   19.4500 |       24 |
+| Gula Malacca                     |   19.4500 |       50 |
+| Gula Malacca                     |   19.4500 |       16 |
+| Gula Malacca                     |   19.4500 |       10 |
+| Gula Malacca                     |   19.4500 |       16 |
+| Gula Malacca                     |   19.4500 |       18 |
+| Gula Malacca                     |   19.4500 |        6 |
+| Gula Malacca                     |   19.4500 |       12 |
+| Gula Malacca                     |   19.4500 |       15 |
+| Gumbr Gummibrchen                |   24.9000 |       50 |
+| Gumbr Gummibrchen                |   24.9000 |       24 |
+| Gumbr Gummibrchen                |   24.9000 |       16 |
+| Gumbr Gummibrchen                |   24.9000 |       70 |
+| Gumbr Gummibrchen                |   24.9000 |       30 |
+| Gumbr Gummibrchen                |   24.9000 |       30 |
+| Gumbr Gummibrchen                |   24.9000 |        2 |
+| Gumbr Gummibrchen                |   24.9000 |       10 |
+| Gumbr Gummibrchen                |   24.9000 |       15 |
+| Gumbr Gummibrchen                |   24.9000 |        6 |
+| Gumbr Gummibrchen                |   24.9000 |       30 |
+| Gumbr Gummibrchen                |   24.9000 |       30 |
+| Gumbr Gummibrchen                |   31.2300 |       40 |
+| Gumbr Gummibrchen                |   31.2300 |        6 |
+| Gumbr Gummibrchen                |   31.2300 |        5 |
+| Gumbr Gummibrchen                |   31.2300 |       35 |
+| Gumbr Gummibrchen                |   31.2300 |       30 |
+| Gumbr Gummibrchen                |   31.2300 |       15 |
+| Gumbr Gummibrchen                |   31.2300 |       30 |
+| Gumbr Gummibrchen                |   31.2300 |       15 |
+| Gumbr Gummibrchen                |   31.2300 |       12 |
+| Gumbr Gummibrchen                |   31.2300 |       20 |
+| Gumbr Gummibrchen                |   31.2300 |       21 |
+| Gumbr Gummibrchen                |   31.2300 |       40 |
+| Gumbr Gummibrchen                |   31.2300 |       12 |
+| Gumbr Gummibrchen                |   31.2300 |       18 |
+| Gumbr Gummibrchen                |   31.2300 |       35 |
+| Gumbr Gummibrchen                |   31.2300 |       20 |
+| Gumbr Gummibrchen                |   31.2300 |        5 |
+| Gumbr Gummibrchen                |   31.2300 |        6 |
+| Gumbr Gummibrchen                |   31.2300 |       63 |
+| Gumbr Gummibrchen                |   31.2300 |       12 |
+| Gustaf's Knckebrd                |   16.8000 |        6 |
+| Gustaf's Knckebrd                |   16.8000 |       12 |
+| Gustaf's Knckebrd                |   21.0000 |       24 |
+| Gustaf's Knckebrd                |   21.0000 |       48 |
+| Gustaf's Knckebrd                |   21.0000 |       40 |
+| Gustaf's Knckebrd                |   21.0000 |       40 |
+| Gustaf's Knckebrd                |   21.0000 |       15 |
+| Gustaf's Knckebrd                |   21.0000 |       20 |
+| Gustaf's Knckebrd                |   21.0000 |        6 |
+| Gustaf's Knckebrd                |   21.0000 |        4 |
+| Gustaf's Knckebrd                |   21.0000 |       52 |
+| Gustaf's Knckebrd                |   21.0000 |       35 |
+| Gustaf's Knckebrd                |   21.0000 |       21 |
+| Gustaf's Knckebrd                |   21.0000 |       25 |
+| Ikura                            |   24.8000 |       24 |
+| Ikura                            |   24.8000 |       15 |
+| Ikura                            |   24.8000 |       30 |
+| Ikura                            |   24.8000 |       16 |
+| Ikura                            |   24.8000 |       14 |
+| Ikura                            |   24.8000 |       20 |
+| Ikura                            |   24.8000 |       20 |
+| Ikura                            |   31.0000 |       16 |
+| Ikura                            |   31.0000 |        2 |
+| Ikura                            |   31.0000 |        5 |
+| Ikura                            |   31.0000 |       10 |
+| Ikura                            |   31.0000 |       70 |
+| Ikura                            |   31.0000 |       18 |
+| Ikura                            |   31.0000 |       24 |
+| Ikura                            |   31.0000 |        2 |
+| Ikura                            |   31.0000 |       20 |
+| Ikura                            |   31.0000 |       18 |
+| Ikura                            |   31.0000 |       18 |
+| Ikura                            |   31.0000 |       21 |
+| Ikura                            |   31.0000 |       16 |
+| Ikura                            |   31.0000 |        6 |
+| Ikura                            |   31.0000 |       10 |
+| Ikura                            |   31.0000 |       36 |
+| Ikura                            |   31.0000 |       15 |
+| Ikura                            |   31.0000 |       16 |
+| Ikura                            |   31.0000 |      100 |
+| Ikura                            |   31.0000 |       10 |
+| Ikura                            |   31.0000 |       70 |
+| Ikura                            |   31.0000 |       20 |
+| Ikura                            |   31.0000 |       25 |
+| Ikura                            |   31.0000 |       30 |
+| Ikura                            |   31.0000 |       24 |
+| Ikura                            |   31.0000 |        1 |
+| Inlagd Sill                      |   15.2000 |       25 |
+| Inlagd Sill                      |   15.2000 |       30 |
+| Inlagd Sill                      |   15.2000 |       40 |
+| Inlagd Sill                      |   15.2000 |       12 |
+| Inlagd Sill                      |   15.2000 |       20 |
+| Inlagd Sill                      |   15.2000 |       40 |
+| Inlagd Sill                      |   15.2000 |       20 |
+| Inlagd Sill                      |   15.2000 |        6 |
+| Inlagd Sill                      |   15.2000 |        5 |
+| Inlagd Sill                      |   19.0000 |       30 |
+| Inlagd Sill                      |   19.0000 |       30 |
+| Inlagd Sill                      |   19.0000 |       60 |
+| Inlagd Sill                      |   19.0000 |       25 |
+| Inlagd Sill                      |   19.0000 |       21 |
+| Inlagd Sill                      |   19.0000 |       55 |
+| Inlagd Sill                      |   19.0000 |       15 |
+| Inlagd Sill                      |   19.0000 |       30 |
+| Inlagd Sill                      |   19.0000 |        6 |
+| Inlagd Sill                      |   19.0000 |        5 |
+| Inlagd Sill                      |   19.0000 |       40 |
+| Inlagd Sill                      |   19.0000 |        6 |
+| Inlagd Sill                      |   19.0000 |       20 |
+| Inlagd Sill                      |   19.0000 |       30 |
+| Inlagd Sill                      |   19.0000 |       50 |
+| Inlagd Sill                      |   19.0000 |       20 |
+| Inlagd Sill                      |   19.0000 |       25 |
+| Inlagd Sill                      |   19.0000 |       30 |
+| Inlagd Sill                      |   19.0000 |       40 |
+| Inlagd Sill                      |   19.0000 |       18 |
+| Inlagd Sill                      |   19.0000 |       16 |
+| Inlagd Sill                      |   19.0000 |       35 |
+| Ipoh Coffee                      |   36.8000 |       25 |
+| Ipoh Coffee                      |   36.8000 |       15 |
+| Ipoh Coffee                      |   36.8000 |       12 |
+| Ipoh Coffee                      |   36.8000 |       20 |
+| Ipoh Coffee                      |   36.8000 |       24 |
+| Ipoh Coffee                      |   36.8000 |       40 |
+| Ipoh Coffee                      |   36.8000 |       20 |
+| Ipoh Coffee                      |   36.8000 |        3 |
+| Ipoh Coffee                      |   36.8000 |       15 |
+| Ipoh Coffee                      |   46.0000 |       15 |
+| Ipoh Coffee                      |   46.0000 |       60 |
+| Ipoh Coffee                      |   46.0000 |       25 |
+| Ipoh Coffee                      |   46.0000 |       20 |
+| Ipoh Coffee                      |   46.0000 |        6 |
+| Ipoh Coffee                      |   46.0000 |       40 |
+| Ipoh Coffee                      |   46.0000 |       24 |
+| Ipoh Coffee                      |   46.0000 |       30 |
+| Ipoh Coffee                      |   46.0000 |       20 |
+| Ipoh Coffee                      |   46.0000 |        7 |
+| Ipoh Coffee                      |   46.0000 |        9 |
+| Ipoh Coffee                      |   46.0000 |        5 |
+| Ipoh Coffee                      |   46.0000 |       10 |
+| Ipoh Coffee                      |   46.0000 |       24 |
+| Ipoh Coffee                      |   46.0000 |        9 |
+| Ipoh Coffee                      |   46.0000 |        6 |
+| Ipoh Coffee                      |   46.0000 |       30 |
+| Ipoh Coffee                      |   46.0000 |       30 |
+| Ipoh Coffee                      |   46.0000 |       36 |
+| Jack's New England Clam Chowder  |    7.7000 |       10 |
+| Jack's New England Clam Chowder  |    7.7000 |       16 |
+| Jack's New England Clam Chowder  |    7.7000 |       25 |
+| Jack's New England Clam Chowder  |    7.7000 |       10 |
+| Jack's New England Clam Chowder  |    7.7000 |       20 |
+| Jack's New England Clam Chowder  |    7.7000 |       12 |
+| Jack's New England Clam Chowder  |    7.7000 |       13 |
+| Jack's New England Clam Chowder  |    7.7000 |        8 |
+| Jack's New England Clam Chowder  |    7.7000 |       25 |
+| Jack's New England Clam Chowder  |    7.7000 |       30 |
+| Jack's New England Clam Chowder  |    7.7000 |       20 |
+| Jack's New England Clam Chowder  |    9.6500 |       80 |
+| Jack's New England Clam Chowder  |    9.6500 |       10 |
+| Jack's New England Clam Chowder  |    9.6500 |        6 |
+| Jack's New England Clam Chowder  |    9.6500 |       14 |
+| Jack's New England Clam Chowder  |    9.6500 |       12 |
+| Jack's New England Clam Chowder  |    9.6500 |        9 |
+| Jack's New England Clam Chowder  |    9.6500 |       20 |
+| Jack's New England Clam Chowder  |    9.6500 |       24 |
+| Jack's New England Clam Chowder  |    9.6500 |      120 |
+| Jack's New England Clam Chowder  |    9.6500 |        4 |
+| Jack's New England Clam Chowder  |    9.6500 |       42 |
+| Jack's New England Clam Chowder  |    9.6500 |       12 |
+| Jack's New England Clam Chowder  |    9.6500 |       12 |
+| Jack's New England Clam Chowder  |    9.6500 |       35 |
+| Jack's New England Clam Chowder  |    9.6500 |       30 |
+| Jack's New England Clam Chowder  |    9.6500 |       10 |
+| Jack's New England Clam Chowder  |    9.6500 |       20 |
+| Jack's New England Clam Chowder  |    9.6500 |       14 |
+| Jack's New England Clam Chowder  |    9.6500 |       20 |
+| Jack's New England Clam Chowder  |    9.6500 |       20 |
+| Jack's New England Clam Chowder  |    9.6500 |       12 |
+| Jack's New England Clam Chowder  |    9.6500 |       14 |
+| Jack's New England Clam Chowder  |    9.6500 |       30 |
+| Jack's New England Clam Chowder  |    9.6500 |        5 |
+| Jack's New England Clam Chowder  |    9.6500 |        6 |
+| Jack's New England Clam Chowder  |    9.6500 |       24 |
+| Jack's New England Clam Chowder  |    9.6500 |        6 |
+| Jack's New England Clam Chowder  |    9.6500 |        4 |
+| Jack's New England Clam Chowder  |    9.6500 |       35 |
+| Jack's New England Clam Chowder  |    9.6500 |       20 |
+| Jack's New England Clam Chowder  |    9.6500 |       28 |
+| Jack's New England Clam Chowder  |    9.6500 |       30 |
+| Jack's New England Clam Chowder  |    9.6500 |       12 |
+| Jack's New England Clam Chowder  |    9.6500 |        9 |
+| Jack's New England Clam Chowder  |    9.6500 |       40 |
+| Jack's New England Clam Chowder  |    9.6500 |        3 |
+| Konbu                            |    4.8000 |       10 |
+| Konbu                            |    4.8000 |       20 |
+| Konbu                            |    4.8000 |       12 |
+| Konbu                            |    4.8000 |       20 |
+| Konbu                            |    4.8000 |       18 |
+| Konbu                            |    4.8000 |       10 |
+| Konbu                            |    4.8000 |        2 |
+| Konbu                            |    4.8000 |        1 |
+| Konbu                            |    6.0000 |       10 |
+| Konbu                            |    6.0000 |       10 |
+| Konbu                            |    6.0000 |        8 |
+| Konbu                            |    6.0000 |       60 |
+| Konbu                            |    6.0000 |        8 |
+| Konbu                            |    6.0000 |       13 |
+| Konbu                            |    6.0000 |        4 |
+| Konbu                            |    6.0000 |        6 |
+| Konbu                            |    6.0000 |       20 |
+| Konbu                            |    6.0000 |        7 |
+| Konbu                            |    6.0000 |       10 |
+| Konbu                            |    6.0000 |        3 |
+| Konbu                            |    6.0000 |        6 |
+| Konbu                            |    6.0000 |       65 |
+| Konbu                            |    6.0000 |       28 |
+| Konbu                            |    6.0000 |        5 |
+| Konbu                            |    6.0000 |       40 |
+| Konbu                            |    6.0000 |       10 |
+| Konbu                            |    6.0000 |       42 |
+| Konbu                            |    6.0000 |       20 |
+| Konbu                            |    6.0000 |       20 |
+| Konbu                            |    6.0000 |       15 |
+| Konbu                            |    6.0000 |       20 |
+| Konbu                            |    6.0000 |       77 |
+| Konbu                            |    6.0000 |       84 |
+| Konbu                            |    6.0000 |       56 |
+| Konbu                            |    6.0000 |       20 |
+| Konbu                            |    6.0000 |       80 |
+| Konbu                            |    6.0000 |        7 |
+| Konbu                            |    6.0000 |       30 |
+| Konbu                            |    6.0000 |       10 |
+| Konbu                            |    6.0000 |        4 |
+| Lakkalikri                       |   14.4000 |       15 |
+| Lakkalikri                       |   14.4000 |       33 |
+| Lakkalikri                       |   14.4000 |        6 |
+| Lakkalikri                       |   14.4000 |       30 |
+| Lakkalikri                       |   14.4000 |       15 |
+| Lakkalikri                       |   14.4000 |       12 |
+| Lakkalikri                       |   14.4000 |       35 |
+| Lakkalikri                       |   14.4000 |       14 |
+| Lakkalikri                       |   14.4000 |       20 |
+| Lakkalikri                       |   14.4000 |       18 |
+| Lakkalikri                       |   14.4000 |       42 |
+| Lakkalikri                       |   18.0000 |       50 |
+| Lakkalikri                       |   18.0000 |       10 |
+| Lakkalikri                       |   18.0000 |       30 |
+| Lakkalikri                       |   18.0000 |       10 |
+| Lakkalikri                       |   18.0000 |       14 |
+| Lakkalikri                       |   18.0000 |        4 |
+| Lakkalikri                       |   18.0000 |       10 |
+| Lakkalikri                       |   18.0000 |       80 |
+| Lakkalikri                       |   18.0000 |       35 |
+| Lakkalikri                       |   18.0000 |       10 |
+| Lakkalikri                       |   18.0000 |       35 |
+| Lakkalikri                       |   18.0000 |       15 |
+| Lakkalikri                       |   18.0000 |       20 |
+| Lakkalikri                       |   18.0000 |       20 |
+| Lakkalikri                       |   18.0000 |       10 |
+| Lakkalikri                       |   18.0000 |       50 |
+| Lakkalikri                       |   18.0000 |       21 |
+| Lakkalikri                       |   18.0000 |       20 |
+| Lakkalikri                       |   18.0000 |       10 |
+| Lakkalikri                       |   18.0000 |       20 |
+| Lakkalikri                       |   18.0000 |        5 |
+| Lakkalikri                       |   18.0000 |       60 |
+| Lakkalikri                       |   18.0000 |       44 |
+| Lakkalikri                       |   18.0000 |       10 |
+| Lakkalikri                       |   18.0000 |       90 |
+| Lakkalikri                       |   18.0000 |        6 |
+| Lakkalikri                       |   18.0000 |       50 |
+| Lakkalikri                       |   18.0000 |        2 |
+| Laughing Lumberjack Lager        |   11.2000 |        5 |
+| Laughing Lumberjack Lager        |   14.0000 |       30 |
+| Laughing Lumberjack Lager        |   14.0000 |        7 |
+| Laughing Lumberjack Lager        |   14.0000 |       25 |
+| Laughing Lumberjack Lager        |   14.0000 |        3 |
+| Laughing Lumberjack Lager        |   14.0000 |       15 |
+| Laughing Lumberjack Lager        |   14.0000 |       15 |
+| Laughing Lumberjack Lager        |   14.0000 |       24 |
+| Laughing Lumberjack Lager        |   14.0000 |       40 |
+| Laughing Lumberjack Lager        |   14.0000 |       20 |
+| Longlife Tofu                    |    8.0000 |       21 |
+| Longlife Tofu                    |    8.0000 |       36 |
+| Longlife Tofu                    |    8.0000 |       20 |
+| Longlife Tofu                    |    8.0000 |       14 |
+| Longlife Tofu                    |    8.0000 |       50 |
+| Longlife Tofu                    |    8.0000 |       15 |
+| Longlife Tofu                    |    8.0000 |       30 |
+| Longlife Tofu                    |    8.0000 |       16 |
+| Longlife Tofu                    |   10.0000 |        5 |
+| Longlife Tofu                    |   10.0000 |       35 |
+| Longlife Tofu                    |   10.0000 |       15 |
+| Longlife Tofu                    |   10.0000 |       20 |
+| Longlife Tofu                    |   10.0000 |       20 |
+| Louisiana Fiery Hot Pepper Sauce |   16.8000 |       15 |
+| Louisiana Fiery Hot Pepper Sauce |   16.8000 |       20 |
+| Louisiana Fiery Hot Pepper Sauce |   16.8000 |       30 |
+| Louisiana Fiery Hot Pepper Sauce |   16.8000 |       40 |
+| Louisiana Fiery Hot Pepper Sauce |   16.8000 |       10 |
+| Louisiana Fiery Hot Pepper Sauce |   16.8000 |        5 |
+| Louisiana Fiery Hot Pepper Sauce |   16.8000 |       15 |
+| Louisiana Fiery Hot Pepper Sauce |   16.8000 |       20 |
+| Louisiana Fiery Hot Pepper Sauce |   16.8000 |       20 |
+| Louisiana Fiery Hot Pepper Sauce |   16.8000 |       35 |
+| Louisiana Fiery Hot Pepper Sauce |   16.8000 |       28 |
+| Louisiana Fiery Hot Pepper Sauce |   16.8000 |       15 |
+| Louisiana Fiery Hot Pepper Sauce |   21.0500 |       20 |
+| Louisiana Fiery Hot Pepper Sauce |   21.0500 |       39 |
+| Louisiana Fiery Hot Pepper Sauce |   21.0500 |       36 |
+| Louisiana Fiery Hot Pepper Sauce |   21.0500 |       30 |
+| Louisiana Fiery Hot Pepper Sauce |   21.0500 |       12 |
+| Louisiana Fiery Hot Pepper Sauce |   21.0500 |       21 |
+| Louisiana Fiery Hot Pepper Sauce |   21.0500 |       15 |
+| Louisiana Fiery Hot Pepper Sauce |   21.0500 |       10 |
+| Louisiana Fiery Hot Pepper Sauce |   21.0500 |       12 |
+| Louisiana Fiery Hot Pepper Sauce |   21.0500 |       65 |
+| Louisiana Fiery Hot Pepper Sauce |   21.0500 |       10 |
+| Louisiana Fiery Hot Pepper Sauce |   21.0500 |       40 |
+| Louisiana Fiery Hot Pepper Sauce |   21.0500 |       80 |
+| Louisiana Fiery Hot Pepper Sauce |   21.0500 |        2 |
+| Louisiana Fiery Hot Pepper Sauce |   21.0500 |       15 |
+| Louisiana Fiery Hot Pepper Sauce |   21.0500 |       21 |
+| Louisiana Fiery Hot Pepper Sauce |   21.0500 |       10 |
+| Louisiana Fiery Hot Pepper Sauce |   21.0500 |       12 |
+| Louisiana Fiery Hot Pepper Sauce |   21.0500 |       21 |
+| Louisiana Fiery Hot Pepper Sauce |   21.0500 |       21 |
+| Louisiana Hot Spiced Okra        |   13.6000 |       30 |
+| Louisiana Hot Spiced Okra        |   13.6000 |       60 |
+| Louisiana Hot Spiced Okra        |   13.6000 |       60 |
+| Louisiana Hot Spiced Okra        |   13.6000 |       10 |
+| Louisiana Hot Spiced Okra        |   17.0000 |       24 |
+| Louisiana Hot Spiced Okra        |   17.0000 |        4 |
+| Louisiana Hot Spiced Okra        |   17.0000 |       50 |
+| Louisiana Hot Spiced Okra        |   17.0000 |        1 |
+| Manjimup Dried Apples            |   42.4000 |       40 |
+| Manjimup Dried Apples            |   42.4000 |       35 |
+| Manjimup Dried Apples            |   42.4000 |        2 |
+| Manjimup Dried Apples            |   42.4000 |       48 |
+| Manjimup Dried Apples            |   42.4000 |       20 |
+| Manjimup Dried Apples            |   42.4000 |       18 |
+| Manjimup Dried Apples            |   42.4000 |       18 |
+| Manjimup Dried Apples            |   42.4000 |        3 |
+| Manjimup Dried Apples            |   42.4000 |       25 |
+| Manjimup Dried Apples            |   53.0000 |        6 |
+| Manjimup Dried Apples            |   53.0000 |       48 |
+| Manjimup Dried Apples            |   53.0000 |       20 |
+| Manjimup Dried Apples            |   53.0000 |       20 |
+| Manjimup Dried Apples            |   53.0000 |       50 |
+| Manjimup Dried Apples            |   53.0000 |        3 |
+| Manjimup Dried Apples            |   53.0000 |       15 |
+| Manjimup Dried Apples            |   53.0000 |       20 |
+| Manjimup Dried Apples            |   53.0000 |       20 |
+| Manjimup Dried Apples            |   53.0000 |       28 |
+| Manjimup Dried Apples            |   53.0000 |        7 |
+| Manjimup Dried Apples            |   53.0000 |       30 |
+| Manjimup Dried Apples            |   53.0000 |       28 |
+| Manjimup Dried Apples            |   53.0000 |      120 |
+| Manjimup Dried Apples            |   53.0000 |       10 |
+| Manjimup Dried Apples            |   53.0000 |       30 |
+| Manjimup Dried Apples            |   53.0000 |        6 |
+| Manjimup Dried Apples            |   53.0000 |        4 |
+| Manjimup Dried Apples            |   53.0000 |        3 |
+| Manjimup Dried Apples            |   53.0000 |        2 |
+| Manjimup Dried Apples            |   53.0000 |       40 |
+| Manjimup Dried Apples            |   53.0000 |        8 |
+| Manjimup Dried Apples            |   53.0000 |       16 |
+| Manjimup Dried Apples            |   53.0000 |       10 |
+| Manjimup Dried Apples            |   53.0000 |       20 |
+| Manjimup Dried Apples            |   53.0000 |       15 |
+| Manjimup Dried Apples            |   53.0000 |       44 |
+| Manjimup Dried Apples            |   53.0000 |       10 |
+| Manjimup Dried Apples            |   53.0000 |       24 |
+| Manjimup Dried Apples            |   53.0000 |       20 |
+| Mascarpone Fabioli               |   25.6000 |        6 |
+| Mascarpone Fabioli               |   25.6000 |       40 |
+| Mascarpone Fabioli               |   25.6000 |        6 |
+| Mascarpone Fabioli               |   32.0000 |       50 |
+| Mascarpone Fabioli               |   32.0000 |       24 |
+| Mascarpone Fabioli               |   32.0000 |       10 |
+| Mascarpone Fabioli               |   32.0000 |        4 |
+| Mascarpone Fabioli               |   32.0000 |       10 |
+| Mascarpone Fabioli               |   32.0000 |       20 |
+| Mascarpone Fabioli               |   32.0000 |        6 |
+| Mascarpone Fabioli               |   32.0000 |       35 |
+| Mascarpone Fabioli               |   32.0000 |       50 |
+| Mascarpone Fabioli               |   32.0000 |       15 |
+| Mascarpone Fabioli               |   32.0000 |       20 |
+| Mascarpone Fabioli               |   32.0000 |        1 |
+| Maxilaku                         |   16.0000 |       40 |
+| Maxilaku                         |   16.0000 |       15 |
+| Maxilaku                         |   16.0000 |       30 |
+| Maxilaku                         |   16.0000 |       35 |
+| Maxilaku                         |   16.0000 |       30 |
+| Maxilaku                         |   16.0000 |       30 |
+| Maxilaku                         |   16.0000 |       21 |
+| Maxilaku                         |   16.0000 |       24 |
+| Maxilaku                         |   20.0000 |       25 |
+| Maxilaku                         |   20.0000 |        6 |
+| Maxilaku                         |   20.0000 |       25 |
+| Maxilaku                         |   20.0000 |       18 |
+| Maxilaku                         |   20.0000 |        4 |
+| Maxilaku                         |   20.0000 |       42 |
+| Maxilaku                         |   20.0000 |       15 |
+| Maxilaku                         |   20.0000 |       20 |
+| Maxilaku                         |   20.0000 |       10 |
+| Maxilaku                         |   20.0000 |       28 |
+| Maxilaku                         |   20.0000 |       40 |
+| Maxilaku                         |   20.0000 |        2 |
+| Maxilaku                         |   20.0000 |       60 |
+| Mishi Kobe Niku                  |   77.6000 |       20 |
+| Mishi Kobe Niku                  |   97.0000 |       16 |
+| Mishi Kobe Niku                  |   97.0000 |       50 |
+| Mishi Kobe Niku                  |   97.0000 |        6 |
+| Mishi Kobe Niku                  |   97.0000 |        3 |
+| Mozzarella di Giovanni           |   34.8000 |        5 |
+| Mozzarella di Giovanni           |   27.8000 |        4 |
+| Mozzarella di Giovanni           |   27.8000 |       20 |
+| Mozzarella di Giovanni           |   27.8000 |       24 |
+| Mozzarella di Giovanni           |   27.8000 |        7 |
+| Mozzarella di Giovanni           |   27.8000 |        3 |
+| Mozzarella di Giovanni           |   27.8000 |       20 |
+| Mozzarella di Giovanni           |   27.8000 |       40 |
+| Mozzarella di Giovanni           |   27.8000 |       25 |
+| Mozzarella di Giovanni           |   27.8000 |       25 |
+| Mozzarella di Giovanni           |   27.8000 |       42 |
+| Mozzarella di Giovanni           |   27.8000 |       24 |
+| Mozzarella di Giovanni           |   27.8000 |       21 |
+| Mozzarella di Giovanni           |   27.8000 |       10 |
+| Mozzarella di Giovanni           |   27.8000 |       40 |
+| Mozzarella di Giovanni           |   27.8000 |       25 |
+| Mozzarella di Giovanni           |   34.8000 |        9 |
+| Mozzarella di Giovanni           |   34.8000 |       24 |
+| Mozzarella di Giovanni           |   34.8000 |       21 |
+| Mozzarella di Giovanni           |   34.8000 |        1 |
+| Mozzarella di Giovanni           |   34.8000 |       24 |
+| Mozzarella di Giovanni           |   34.8000 |       30 |
+| Mozzarella di Giovanni           |   34.8000 |       12 |
+| Mozzarella di Giovanni           |   34.8000 |       60 |
+| Mozzarella di Giovanni           |   34.8000 |       15 |
+| Mozzarella di Giovanni           |   34.8000 |       35 |
+| Mozzarella di Giovanni           |   34.8000 |        7 |
+| Mozzarella di Giovanni           |   34.8000 |       30 |
+| Mozzarella di Giovanni           |   34.8000 |       10 |
+| Mozzarella di Giovanni           |   34.8000 |       40 |
+| Mozzarella di Giovanni           |   34.8000 |       15 |
+| Mozzarella di Giovanni           |   34.8000 |       10 |
+| Mozzarella di Giovanni           |   34.8000 |       16 |
+| Mozzarella di Giovanni           |   34.8000 |       50 |
+| Mozzarella di Giovanni           |   34.8000 |        5 |
+| Mozzarella di Giovanni           |   34.8000 |       20 |
+| Mozzarella di Giovanni           |   34.8000 |        2 |
+| Mozzarella di Giovanni           |   34.8000 |       35 |
+| Nord-Ost Matjeshering            |   20.7000 |       60 |
+| Nord-Ost Matjeshering            |   20.7000 |        6 |
+| Nord-Ost Matjeshering            |   20.7000 |       10 |
+| Nord-Ost Matjeshering            |   20.7000 |       35 |
+| Nord-Ost Matjeshering            |   20.7000 |        8 |
+| Nord-Ost Matjeshering            |   20.7000 |       15 |
+| Nord-Ost Matjeshering            |   20.7000 |       18 |
+| Nord-Ost Matjeshering            |   20.7000 |       18 |
+| Nord-Ost Matjeshering            |   20.7000 |       28 |
+| Nord-Ost Matjeshering            |   20.7000 |        8 |
+| Nord-Ost Matjeshering            |   25.8900 |       20 |
+| Nord-Ost Matjeshering            |   25.8900 |       10 |
+| Nord-Ost Matjeshering            |   25.8900 |       15 |
+| Nord-Ost Matjeshering            |   25.8900 |       10 |
+| Nord-Ost Matjeshering            |   25.8900 |       20 |
+| Nord-Ost Matjeshering            |   25.8900 |       30 |
+| Nord-Ost Matjeshering            |   25.8900 |        2 |
+| Nord-Ost Matjeshering            |   25.8900 |        3 |
+| Nord-Ost Matjeshering            |   25.8900 |       15 |
+| Nord-Ost Matjeshering            |   25.8900 |       15 |
+| Nord-Ost Matjeshering            |   25.8900 |       30 |
+| Nord-Ost Matjeshering            |   25.8900 |       15 |
+| Nord-Ost Matjeshering            |   25.8900 |       25 |
+| Nord-Ost Matjeshering            |   25.8900 |       20 |
+| Nord-Ost Matjeshering            |   25.8900 |       40 |
+| Nord-Ost Matjeshering            |   25.8900 |       15 |
+| Nord-Ost Matjeshering            |   25.8900 |       35 |
+| Nord-Ost Matjeshering            |   25.8900 |       36 |
+| Nord-Ost Matjeshering            |   25.8900 |        1 |
+| Nord-Ost Matjeshering            |   25.8900 |       30 |
+| Nord-Ost Matjeshering            |   25.8900 |       15 |
+| Nord-Ost Matjeshering            |   25.8900 |        4 |
+| Northwoods Cranberry Sauce       |   32.0000 |       70 |
+| Northwoods Cranberry Sauce       |   32.0000 |       70 |
+| Northwoods Cranberry Sauce       |   40.0000 |       10 |
+| Northwoods Cranberry Sauce       |   40.0000 |       24 |
+| Northwoods Cranberry Sauce       |   40.0000 |       10 |
+| Northwoods Cranberry Sauce       |   40.0000 |       40 |
+| Northwoods Cranberry Sauce       |   40.0000 |       30 |
+| Northwoods Cranberry Sauce       |   40.0000 |       20 |
+| Northwoods Cranberry Sauce       |   40.0000 |       30 |
+| Northwoods Cranberry Sauce       |   40.0000 |       16 |
+| Northwoods Cranberry Sauce       |   40.0000 |       20 |
+| Northwoods Cranberry Sauce       |   40.0000 |       30 |
+| Northwoods Cranberry Sauce       |   40.0000 |        2 |
+| NuNuCa Nu-Nougat-Creme           |   11.2000 |        4 |
+| NuNuCa Nu-Nougat-Creme           |   11.2000 |       10 |
+| NuNuCa Nu-Nougat-Creme           |   11.2000 |       50 |
+| NuNuCa Nu-Nougat-Creme           |   11.2000 |        7 |
+| NuNuCa Nu-Nougat-Creme           |   11.2000 |       12 |
+| NuNuCa Nu-Nougat-Creme           |   11.2000 |       60 |
+| NuNuCa Nu-Nougat-Creme           |   14.0000 |       18 |
+| NuNuCa Nu-Nougat-Creme           |   14.0000 |       12 |
+| NuNuCa Nu-Nougat-Creme           |   14.0000 |       35 |
+| NuNuCa Nu-Nougat-Creme           |   14.0000 |       15 |
+| NuNuCa Nu-Nougat-Creme           |   14.0000 |        5 |
+| NuNuCa Nu-Nougat-Creme           |   14.0000 |       10 |
+| NuNuCa Nu-Nougat-Creme           |   14.0000 |        6 |
+| NuNuCa Nu-Nougat-Creme           |   14.0000 |       20 |
+| NuNuCa Nu-Nougat-Creme           |   14.0000 |       10 |
+| NuNuCa Nu-Nougat-Creme           |   14.0000 |        5 |
+| NuNuCa Nu-Nougat-Creme           |   14.0000 |       24 |
+| NuNuCa Nu-Nougat-Creme           |   14.0000 |       15 |
+| Original Frankfurter grne Soe    |   10.4000 |       12 |
+| Original Frankfurter grne Soe    |   10.4000 |       15 |
+| Original Frankfurter grne Soe    |   10.4000 |       10 |
+| Original Frankfurter grne Soe    |   10.4000 |        5 |
+| Original Frankfurter grne Soe    |   10.4000 |        7 |
+| Original Frankfurter grne Soe    |   10.4000 |       14 |
+| Original Frankfurter grne Soe    |   10.4000 |       35 |
+| Original Frankfurter grne Soe    |   10.4000 |       10 |
+| Original Frankfurter grne Soe    |   10.4000 |       55 |
+| Original Frankfurter grne Soe    |   10.4000 |       30 |
+| Original Frankfurter grne Soe    |   10.4000 |        7 |
+| Original Frankfurter grne Soe    |   10.4000 |        5 |
+| Original Frankfurter grne Soe    |   10.4000 |       25 |
+| Original Frankfurter grne Soe    |   13.0000 |       10 |
+| Original Frankfurter grne Soe    |   13.0000 |       18 |
+| Original Frankfurter grne Soe    |   13.0000 |       20 |
+| Original Frankfurter grne Soe    |   13.0000 |       60 |
+| Original Frankfurter grne Soe    |   13.0000 |        5 |
+| Original Frankfurter grne Soe    |   13.0000 |       35 |
+| Original Frankfurter grne Soe    |   13.0000 |       70 |
+| Original Frankfurter grne Soe    |   13.0000 |       30 |
+| Original Frankfurter grne Soe    |   13.0000 |        2 |
+| Original Frankfurter grne Soe    |   13.0000 |       15 |
+| Original Frankfurter grne Soe    |   13.0000 |       20 |
+| Original Frankfurter grne Soe    |   13.0000 |       15 |
+| Original Frankfurter grne Soe    |   13.0000 |        2 |
+| Original Frankfurter grne Soe    |   13.0000 |       15 |
+| Original Frankfurter grne Soe    |   13.0000 |       25 |
+| Original Frankfurter grne Soe    |   13.0000 |       40 |
+| Original Frankfurter grne Soe    |   13.0000 |       15 |
+| Original Frankfurter grne Soe    |   13.0000 |       40 |
+| Original Frankfurter grne Soe    |   13.0000 |       15 |
+| Original Frankfurter grne Soe    |   13.0000 |       21 |
+| Original Frankfurter grne Soe    |   13.0000 |       30 |
+| Original Frankfurter grne Soe    |   13.0000 |       18 |
+| Original Frankfurter grne Soe    |   13.0000 |       10 |
+| Original Frankfurter grne Soe    |   13.0000 |       28 |
+| Original Frankfurter grne Soe    |   13.0000 |        2 |
+| Outback Lager                    |   12.0000 |       21 |
+| Outback Lager                    |   12.0000 |       20 |
+| Outback Lager                    |   12.0000 |       20 |
+| Outback Lager                    |   12.0000 |        5 |
+| Outback Lager                    |   12.0000 |       30 |
+| Outback Lager                    |   12.0000 |       30 |
+| Outback Lager                    |   12.0000 |       30 |
+| Outback Lager                    |   12.0000 |        8 |
+| Outback Lager                    |   12.0000 |       25 |
+| Outback Lager                    |   12.0000 |       12 |
+| Outback Lager                    |   12.0000 |       60 |
+| Outback Lager                    |   15.0000 |       14 |
+| Outback Lager                    |   15.0000 |        6 |
+| Outback Lager                    |   15.0000 |        7 |
+| Outback Lager                    |   15.0000 |       15 |
+| Outback Lager                    |   15.0000 |       20 |
+| Outback Lager                    |   15.0000 |       15 |
+| Outback Lager                    |   15.0000 |       40 |
+| Outback Lager                    |   15.0000 |       50 |
+| Outback Lager                    |   15.0000 |       30 |
+| Outback Lager                    |   15.0000 |        8 |
+| Outback Lager                    |   15.0000 |       28 |
+| Outback Lager                    |   15.0000 |       40 |
+| Outback Lager                    |   15.0000 |       35 |
+| Outback Lager                    |   15.0000 |        5 |
+| Outback Lager                    |   15.0000 |        6 |
+| Outback Lager                    |   15.0000 |        9 |
+| Outback Lager                    |   15.0000 |       12 |
+| Outback Lager                    |   15.0000 |       30 |
+| Outback Lager                    |   15.0000 |       30 |
+| Outback Lager                    |   15.0000 |        4 |
+| Outback Lager                    |   15.0000 |       50 |
+| Outback Lager                    |   15.0000 |       30 |
+| Outback Lager                    |   15.0000 |        3 |
+| Outback Lager                    |   15.0000 |       20 |
+| Outback Lager                    |   15.0000 |       30 |
+| Outback Lager                    |   15.0000 |        4 |
+| Outback Lager                    |   15.0000 |        3 |
+| Outback Lager                    |   15.0000 |       12 |
+| Pavlova                          |   13.9000 |       35 |
+| Pavlova                          |   13.9000 |       60 |
+| Pavlova                          |   13.9000 |       40 |
+| Pavlova                          |   13.9000 |       30 |
+| Pavlova                          |   13.9000 |       10 |
+| Pavlova                          |   13.9000 |       21 |
+| Pavlova                          |   13.9000 |       56 |
+| Pavlova                          |   13.9000 |       21 |
+| Pavlova                          |   13.9000 |       16 |
+| Pavlova                          |   13.9000 |       49 |
+| Pavlova                          |   13.9000 |       20 |
+| Pavlova                          |   13.9000 |       35 |
+| Pavlova                          |   13.9000 |       18 |
+| Pavlova                          |   17.4500 |       50 |
+| Pavlova                          |   17.4500 |       40 |
+| Pavlova                          |   17.4500 |       14 |
+| Pavlova                          |   17.4500 |       30 |
+| Pavlova                          |   17.4500 |       12 |
+| Pavlova                          |   17.4500 |       30 |
+| Pavlova                          |   17.4500 |       30 |
+| Pavlova                          |   17.4500 |       10 |
+| Pavlova                          |   17.4500 |        3 |
+| Pavlova                          |   17.4500 |       50 |
+| Pavlova                          |   17.4500 |       20 |
+| Pavlova                          |   17.4500 |       20 |
+| Pavlova                          |   17.4500 |       15 |
+| Pavlova                          |   17.4500 |        3 |
+| Pavlova                          |   17.4500 |       20 |
+| Pavlova                          |   17.4500 |       65 |
+| Pavlova                          |   17.4500 |       50 |
+| Pavlova                          |   17.4500 |       12 |
+| Pavlova                          |   17.4500 |       30 |
+| Pavlova                          |   17.4500 |       15 |
+| Pavlova                          |   17.4500 |        6 |
+| Pavlova                          |   17.4500 |       24 |
+| Pavlova                          |   17.4500 |       30 |
+| Pavlova                          |   17.4500 |       28 |
+| Pavlova                          |   17.4500 |       55 |
+| Pavlova                          |   17.4500 |       36 |
+| Pavlova                          |   17.4500 |        3 |
+| Pavlova                          |   17.4500 |       30 |
+| Pavlova                          |   17.4500 |       14 |
+| Pavlova                          |   17.4500 |        2 |
+| Perth Pasties                    |   26.2000 |       15 |
+| Perth Pasties                    |   26.2000 |       36 |
+| Perth Pasties                    |   26.2000 |       10 |
+| Perth Pasties                    |   26.2000 |       20 |
+| Perth Pasties                    |   26.2000 |       20 |
+| Perth Pasties                    |   26.2000 |       40 |
+| Perth Pasties                    |   26.2000 |       70 |
+| Perth Pasties                    |   26.2000 |       10 |
+| Perth Pasties                    |   26.2000 |       15 |
+| Perth Pasties                    |   26.2000 |       15 |
+| Perth Pasties                    |   26.2000 |       50 |
+| Perth Pasties                    |   26.2000 |       28 |
+| Perth Pasties                    |   32.8000 |        6 |
+| Perth Pasties                    |   32.8000 |       10 |
+| Perth Pasties                    |   32.8000 |        5 |
+| Perth Pasties                    |   32.8000 |       18 |
+| Perth Pasties                    |   32.8000 |       25 |
+| Perth Pasties                    |   32.8000 |       12 |
+| Perth Pasties                    |   32.8000 |       25 |
+| Perth Pasties                    |   32.8000 |       10 |
+| Perth Pasties                    |   32.8000 |      120 |
+| Perth Pasties                    |   32.8000 |        3 |
+| Perth Pasties                    |   32.8000 |       20 |
+| Perth Pasties                    |   32.8000 |        9 |
+| Perth Pasties                    |   32.8000 |        3 |
+| Perth Pasties                    |   32.8000 |        2 |
+| Perth Pasties                    |   32.8000 |       20 |
+| Perth Pasties                    |   32.8000 |       70 |
+| Perth Pasties                    |   32.8000 |       10 |
+| Perth Pasties                    |   32.8000 |       25 |
+| Pt chinois                       |   19.2000 |       21 |
+| Pt chinois                       |   19.2000 |       20 |
+| Pt chinois                       |   19.2000 |       40 |
+| Pt chinois                       |   19.2000 |       12 |
+| Pt chinois                       |   19.2000 |       15 |
+| Pt chinois                       |   19.2000 |      120 |
+| Pt chinois                       |   19.2000 |       10 |
+| Pt chinois                       |   19.2000 |      120 |
+| Pt chinois                       |   19.2000 |       60 |
+| Pt chinois                       |   19.2000 |        2 |
+| Pt chinois                       |   19.2000 |       30 |
+| Pt chinois                       |   24.0000 |       14 |
+| Pt chinois                       |   24.0000 |       18 |
+| Pt chinois                       |   24.0000 |       25 |
+| Pt chinois                       |   24.0000 |       20 |
+| Pt chinois                       |   24.0000 |        5 |
+| Pt chinois                       |   24.0000 |       12 |
+| Pt chinois                       |   24.0000 |        4 |
+| Pt chinois                       |   24.0000 |       21 |
+| Pt chinois                       |   24.0000 |        6 |
+| Pt chinois                       |   24.0000 |       12 |
+| Pt chinois                       |   24.0000 |       60 |
+| Pt chinois                       |   24.0000 |       10 |
+| Pt chinois                       |   24.0000 |       30 |
+| Pt chinois                       |   24.0000 |       25 |
+| Pt chinois                       |   24.0000 |        4 |
+| Pt chinois                       |   24.0000 |       65 |
+| Pt chinois                       |   24.0000 |        6 |
+| Pt chinois                       |   24.0000 |       40 |
+| Pt chinois                       |   24.0000 |       35 |
+| Pt chinois                       |   24.0000 |       35 |
+| Pt chinois                       |   24.0000 |        4 |
+| Pt chinois                       |   24.0000 |        2 |
+| Queso Cabrales                   |   14.0000 |       12 |
+| Queso Cabrales                   |   16.8000 |       12 |
+| Queso Cabrales                   |   16.8000 |       50 |
+| Queso Cabrales                   |   16.8000 |       12 |
+| Queso Cabrales                   |   16.8000 |       24 |
+| Queso Cabrales                   |   16.8000 |       30 |
+| Queso Cabrales                   |   16.8000 |        6 |
+| Queso Cabrales                   |   16.8000 |       30 |
+| Queso Cabrales                   |   16.8000 |        6 |
+| Queso Cabrales                   |   16.8000 |       10 |
+| Queso Cabrales                   |   16.8000 |        5 |
+| Queso Cabrales                   |   16.8000 |       15 |
+| Queso Cabrales                   |   21.0000 |        3 |
+| Queso Cabrales                   |   21.0000 |       50 |
+| Queso Cabrales                   |   21.0000 |       15 |
+| Queso Cabrales                   |   21.0000 |       10 |
+| Queso Cabrales                   |   21.0000 |       15 |
+| Queso Cabrales                   |   21.0000 |       35 |
+| Queso Cabrales                   |   21.0000 |       15 |
+| Queso Cabrales                   |   21.0000 |       14 |
+| Queso Cabrales                   |   21.0000 |       10 |
+| Queso Cabrales                   |   21.0000 |       15 |
+| Queso Cabrales                   |   21.0000 |        5 |
+| Queso Cabrales                   |   21.0000 |       15 |
+| Queso Cabrales                   |   21.0000 |       20 |
+| Queso Cabrales                   |   21.0000 |       50 |
+| Queso Cabrales                   |   21.0000 |       20 |
+| Queso Cabrales                   |   21.0000 |       15 |
+| Queso Cabrales                   |   21.0000 |       25 |
+| Queso Cabrales                   |   21.0000 |       10 |
+| Queso Cabrales                   |   21.0000 |       40 |
+| Queso Cabrales                   |   21.0000 |       40 |
+| Queso Cabrales                   |   21.0000 |        2 |
+| Queso Cabrales                   |   21.0000 |        5 |
+| Queso Cabrales                   |   21.0000 |       30 |
+| Queso Cabrales                   |   21.0000 |       15 |
+| Queso Cabrales                   |   21.0000 |       10 |
+| Queso Cabrales                   |   21.0000 |       10 |
+| Queso Manchego La Pastora        |   30.4000 |       12 |
+| Queso Manchego La Pastora        |   30.4000 |       15 |
+| Queso Manchego La Pastora        |   38.0000 |       15 |
+| Queso Manchego La Pastora        |   38.0000 |       30 |
+| Queso Manchego La Pastora        |   38.0000 |       36 |
+| Queso Manchego La Pastora        |   38.0000 |      100 |
+| Queso Manchego La Pastora        |   38.0000 |        4 |
+| Queso Manchego La Pastora        |   38.0000 |       36 |
+| Queso Manchego La Pastora        |   38.0000 |       30 |
+| Queso Manchego La Pastora        |   38.0000 |       20 |
+| Queso Manchego La Pastora        |   38.0000 |       20 |
+| Queso Manchego La Pastora        |   38.0000 |       20 |
+| Queso Manchego La Pastora        |   38.0000 |        4 |
+| Queso Manchego La Pastora        |   38.0000 |        2 |
+| Raclette Courdavault             |   44.0000 |       30 |
+| Raclette Courdavault             |   44.0000 |       70 |
+| Raclette Courdavault             |   44.0000 |        6 |
+| Raclette Courdavault             |   44.0000 |       15 |
+| Raclette Courdavault             |   44.0000 |       30 |
+| Raclette Courdavault             |   44.0000 |       10 |
+| Raclette Courdavault             |   44.0000 |       40 |
+| Raclette Courdavault             |   44.0000 |        9 |
+| Raclette Courdavault             |   44.0000 |        9 |
+| Raclette Courdavault             |   44.0000 |       12 |
+| Raclette Courdavault             |   44.0000 |       16 |
+| Raclette Courdavault             |   44.0000 |        9 |
+| Raclette Courdavault             |   44.0000 |       20 |
+| Raclette Courdavault             |   44.0000 |       70 |
+| Raclette Courdavault             |   44.0000 |       36 |
+| Raclette Courdavault             |   44.0000 |       60 |
+| Raclette Courdavault             |   44.0000 |       12 |
+| Raclette Courdavault             |   44.0000 |       30 |
+| Raclette Courdavault             |   44.0000 |       60 |
+| Raclette Courdavault             |   55.0000 |        4 |
+| Raclette Courdavault             |   55.0000 |        2 |
+| Raclette Courdavault             |   55.0000 |       15 |
+| Raclette Courdavault             |   55.0000 |       40 |
+| Raclette Courdavault             |   55.0000 |       12 |
+| Raclette Courdavault             |   55.0000 |       35 |
+| Raclette Courdavault             |   55.0000 |       20 |
+| Raclette Courdavault             |   55.0000 |       30 |
+| Raclette Courdavault             |   55.0000 |        1 |
+| Raclette Courdavault             |   55.0000 |       12 |
+| Raclette Courdavault             |   55.0000 |       25 |
+| Raclette Courdavault             |   55.0000 |       42 |
+| Raclette Courdavault             |   55.0000 |       35 |
+| Raclette Courdavault             |   55.0000 |        8 |
+| Raclette Courdavault             |   55.0000 |       10 |
+| Raclette Courdavault             |   55.0000 |       45 |
+| Raclette Courdavault             |   55.0000 |        6 |
+| Raclette Courdavault             |   55.0000 |       25 |
+| Raclette Courdavault             |   55.0000 |        7 |
+| Raclette Courdavault             |   55.0000 |       25 |
+| Raclette Courdavault             |   55.0000 |       25 |
+| Raclette Courdavault             |   55.0000 |       15 |
+| Raclette Courdavault             |   55.0000 |       40 |
+| Raclette Courdavault             |   55.0000 |       15 |
+| Raclette Courdavault             |   55.0000 |       50 |
+| Raclette Courdavault             |   55.0000 |       42 |
+| Raclette Courdavault             |   55.0000 |       40 |
+| Raclette Courdavault             |   55.0000 |        4 |
+| Raclette Courdavault             |   55.0000 |       18 |
+| Raclette Courdavault             |   55.0000 |       10 |
+| Raclette Courdavault             |   55.0000 |      110 |
+| Raclette Courdavault             |   55.0000 |       24 |
+| Raclette Courdavault             |   55.0000 |      100 |
+| Raclette Courdavault             |   55.0000 |       30 |
+| Raclette Courdavault             |   55.0000 |       30 |
+| Ravioli Angelo                   |   15.6000 |       15 |
+| Ravioli Angelo                   |   15.6000 |       50 |
+| Ravioli Angelo                   |   15.6000 |        2 |
+| Ravioli Angelo                   |   15.6000 |       16 |
+| Ravioli Angelo                   |   15.6000 |       25 |
+| Ravioli Angelo                   |   15.6000 |       25 |
+| Ravioli Angelo                   |   15.6000 |       20 |
+| Ravioli Angelo                   |   15.6000 |       15 |
+| Ravioli Angelo                   |   19.5000 |        5 |
+| Ravioli Angelo                   |   19.5000 |        6 |
+| Ravioli Angelo                   |   19.5000 |        4 |
+| Ravioli Angelo                   |   19.5000 |       20 |
+| Ravioli Angelo                   |   19.5000 |       40 |
+| Ravioli Angelo                   |   19.5000 |       14 |
+| Ravioli Angelo                   |   19.5000 |       15 |
+| Ravioli Angelo                   |   19.5000 |       15 |
+| Ravioli Angelo                   |   19.5000 |       24 |
+| Ravioli Angelo                   |   19.5000 |       10 |
+| Ravioli Angelo                   |   19.5000 |       20 |
+| Ravioli Angelo                   |   19.5000 |       30 |
+| Ravioli Angelo                   |   19.5000 |       15 |
+| Ravioli Angelo                   |   19.5000 |       28 |
+| Ravioli Angelo                   |   19.5000 |       20 |
+| Rd Kaviar                        |   12.0000 |       25 |
+| Rd Kaviar                        |   12.0000 |       20 |
+| Rd Kaviar                        |   12.0000 |       20 |
+| Rd Kaviar                        |   15.0000 |       24 |
+| Rd Kaviar                        |   15.0000 |        9 |
+| Rd Kaviar                        |   15.0000 |        3 |
+| Rd Kaviar                        |   15.0000 |       30 |
+| Rd Kaviar                        |   15.0000 |       35 |
+| Rd Kaviar                        |   15.0000 |       50 |
+| Rd Kaviar                        |   15.0000 |       15 |
+| Rd Kaviar                        |   15.0000 |       35 |
+| Rd Kaviar                        |   15.0000 |       15 |
+| Rd Kaviar                        |   15.0000 |       10 |
+| Rd Kaviar                        |   15.0000 |        2 |
+| Rhnbru Klosterbier               |    6.2000 |       30 |
+| Rhnbru Klosterbier               |    6.2000 |        6 |
+| Rhnbru Klosterbier               |    6.2000 |        6 |
+| Rhnbru Klosterbier               |    6.2000 |       10 |
+| Rhnbru Klosterbier               |    6.2000 |       50 |
+| Rhnbru Klosterbier               |    6.2000 |        6 |
+| Rhnbru Klosterbier               |    6.2000 |       12 |
+| Rhnbru Klosterbier               |    6.2000 |       24 |
+| Rhnbru Klosterbier               |    6.2000 |        4 |
+| Rhnbru Klosterbier               |    6.2000 |       10 |
+| Rhnbru Klosterbier               |    6.2000 |       36 |
+| Rhnbru Klosterbier               |    7.7500 |       36 |
+| Rhnbru Klosterbier               |    7.7500 |       50 |
+| Rhnbru Klosterbier               |    7.7500 |       30 |
+| Rhnbru Klosterbier               |    7.7500 |       20 |
+| Rhnbru Klosterbier               |    7.7500 |       15 |
+| Rhnbru Klosterbier               |    7.7500 |       20 |
+| Rhnbru Klosterbier               |    7.7500 |       21 |
+| Rhnbru Klosterbier               |    7.7500 |       50 |
+| Rhnbru Klosterbier               |    7.7500 |       30 |
+| Rhnbru Klosterbier               |    7.7500 |       40 |
+| Rhnbru Klosterbier               |    7.7500 |        8 |
+| Rhnbru Klosterbier               |    7.7500 |        2 |
+| Rhnbru Klosterbier               |    7.7500 |       25 |
+| Rhnbru Klosterbier               |    7.7500 |       30 |
+| Rhnbru Klosterbier               |    7.7500 |       42 |
+| Rhnbru Klosterbier               |    7.7500 |       20 |
+| Rhnbru Klosterbier               |    7.7500 |       18 |
+| Rhnbru Klosterbier               |    7.7500 |        7 |
+| Rhnbru Klosterbier               |    7.7500 |       10 |
+| Rhnbru Klosterbier               |    7.7500 |       42 |
+| Rhnbru Klosterbier               |    7.7500 |       40 |
+| Rhnbru Klosterbier               |    7.7500 |       20 |
+| Rhnbru Klosterbier               |    7.7500 |      120 |
+| Rhnbru Klosterbier               |    7.7500 |       14 |
+| Rhnbru Klosterbier               |    7.7500 |        6 |
+| Rhnbru Klosterbier               |    7.7500 |       49 |
+| Rhnbru Klosterbier               |    7.7500 |       20 |
+| Rhnbru Klosterbier               |    7.7500 |       50 |
+| Rhnbru Klosterbier               |    7.7500 |       12 |
+| Rhnbru Klosterbier               |    7.7500 |       20 |
+| Rhnbru Klosterbier               |    7.7500 |       10 |
+| Rhnbru Klosterbier               |    7.7500 |       10 |
+| Rhnbru Klosterbier               |    7.7500 |       40 |
+| Rhnbru Klosterbier               |    7.7500 |       30 |
+| Rhnbru Klosterbier               |    7.7500 |        4 |
+| Rogede sild                      |    7.6000 |       15 |
+| Rogede sild                      |    7.6000 |       30 |
+| Rogede sild                      |    9.5000 |       21 |
+| Rogede sild                      |    9.5000 |      100 |
+| Rogede sild                      |    9.5000 |       20 |
+| Rogede sild                      |    9.5000 |      110 |
+| Rogede sild                      |    9.5000 |       40 |
+| Rogede sild                      |    9.5000 |       40 |
+| Rogede sild                      |    9.5000 |        4 |
+| Rogede sild                      |    9.5000 |       27 |
+| Rogede sild                      |    9.5000 |       36 |
+| Rogede sild                      |    9.5000 |       15 |
+| Rogede sild                      |    9.5000 |       30 |
+| Rogede sild                      |    9.5000 |       20 |
+| Rssle Sauerkraut                 |   36.4000 |       20 |
+| Rssle Sauerkraut                 |   36.4000 |       28 |
+| Rssle Sauerkraut                 |   36.4000 |        4 |
+| Rssle Sauerkraut                 |   36.4000 |       14 |
+| Rssle Sauerkraut                 |   36.4000 |       30 |
+| Rssle Sauerkraut                 |   36.4000 |       13 |
+| Rssle Sauerkraut                 |   36.4000 |       20 |
+| Rssle Sauerkraut                 |   36.4000 |        6 |
+| Rssle Sauerkraut                 |   36.4000 |       42 |
+| Rssle Sauerkraut                 |   36.4000 |       12 |
+| Rssle Sauerkraut                 |   36.4000 |       15 |
+| Rssle Sauerkraut                 |   36.4000 |       30 |
+| Rssle Sauerkraut                 |   36.4000 |       18 |
+| Rssle Sauerkraut                 |   45.6000 |       20 |
+| Rssle Sauerkraut                 |   45.6000 |        8 |
+| Rssle Sauerkraut                 |   45.6000 |        3 |
+| Rssle Sauerkraut                 |   45.6000 |       35 |
+| Rssle Sauerkraut                 |   45.6000 |        7 |
+| Rssle Sauerkraut                 |   45.6000 |       10 |
+| Rssle Sauerkraut                 |   45.6000 |       15 |
+| Rssle Sauerkraut                 |   45.6000 |       20 |
+| Rssle Sauerkraut                 |   45.6000 |       60 |
+| Rssle Sauerkraut                 |   45.6000 |       20 |
+| Rssle Sauerkraut                 |   45.6000 |        5 |
+| Rssle Sauerkraut                 |   45.6000 |       24 |
+| Rssle Sauerkraut                 |   45.6000 |        3 |
+| Rssle Sauerkraut                 |   45.6000 |       30 |
+| Rssle Sauerkraut                 |   45.6000 |        8 |
+| Rssle Sauerkraut                 |   45.6000 |        2 |
+| Rssle Sauerkraut                 |   45.6000 |       20 |
+| Rssle Sauerkraut                 |   45.6000 |       70 |
+| Rssle Sauerkraut                 |   45.6000 |       20 |
+| Rssle Sauerkraut                 |   45.6000 |        8 |
+| Sasquatch Ale                    |   11.2000 |       20 |
+| Sasquatch Ale                    |   11.2000 |       14 |
+| Sasquatch Ale                    |   11.2000 |       10 |
+| Sasquatch Ale                    |   11.2000 |       36 |
+| Sasquatch Ale                    |   11.2000 |       10 |
+| Sasquatch Ale                    |   11.2000 |       20 |
+| Sasquatch Ale                    |   11.2000 |       35 |
+| Sasquatch Ale                    |   14.0000 |       10 |
+| Sasquatch Ale                    |   14.0000 |       40 |
+| Sasquatch Ale                    |   14.0000 |       14 |
+| Sasquatch Ale                    |   14.0000 |       12 |
+| Sasquatch Ale                    |   14.0000 |       30 |
+| Sasquatch Ale                    |   14.0000 |       10 |
+| Sasquatch Ale                    |   14.0000 |       10 |
+| Sasquatch Ale                    |   14.0000 |       20 |
+| Sasquatch Ale                    |   14.0000 |       60 |
+| Sasquatch Ale                    |   14.0000 |       90 |
+| Sasquatch Ale                    |   14.0000 |       30 |
+| Sasquatch Ale                    |   14.0000 |       35 |
+| Schoggi Schokolade               |   35.1000 |       25 |
+| Schoggi Schokolade               |   35.1000 |       15 |
+| Schoggi Schokolade               |   35.1000 |       50 |
+| Schoggi Schokolade               |   43.9000 |      120 |
+| Schoggi Schokolade               |   43.9000 |       50 |
+| Schoggi Schokolade               |   43.9000 |       40 |
+| Schoggi Schokolade               |   43.9000 |       10 |
+| Schoggi Schokolade               |   43.9000 |       25 |
+| Schoggi Schokolade               |   43.9000 |       30 |
+| Scottish Longbreads              |   10.0000 |        3 |
+| Scottish Longbreads              |   10.0000 |       20 |
+| Scottish Longbreads              |   10.0000 |       15 |
+| Scottish Longbreads              |   10.0000 |        3 |
+| Scottish Longbreads              |   10.0000 |       10 |
+| Scottish Longbreads              |   10.0000 |       10 |
+| Scottish Longbreads              |   10.0000 |        4 |
+| Scottish Longbreads              |   10.0000 |        8 |
+| Scottish Longbreads              |   10.0000 |       60 |
+| Scottish Longbreads              |   10.0000 |       36 |
+| Scottish Longbreads              |   10.0000 |       30 |
+| Scottish Longbreads              |   10.0000 |       21 |
+| Scottish Longbreads              |   10.0000 |       30 |
+| Scottish Longbreads              |   12.5000 |        6 |
+| Scottish Longbreads              |   12.5000 |       20 |
+| Scottish Longbreads              |   12.5000 |       35 |
+| Scottish Longbreads              |   12.5000 |       15 |
+| Scottish Longbreads              |   12.5000 |       18 |
+| Scottish Longbreads              |   12.5000 |       10 |
+| Scottish Longbreads              |   12.5000 |       40 |
+| Scottish Longbreads              |   12.5000 |       45 |
+| Scottish Longbreads              |   12.5000 |        6 |
+| Scottish Longbreads              |   12.5000 |       40 |
+| Scottish Longbreads              |   12.5000 |       18 |
+| Scottish Longbreads              |   12.5000 |       15 |
+| Scottish Longbreads              |   12.5000 |       24 |
+| Scottish Longbreads              |   12.5000 |       20 |
+| Scottish Longbreads              |   12.5000 |       20 |
+| Scottish Longbreads              |   12.5000 |       18 |
+| Scottish Longbreads              |   12.5000 |       20 |
+| Scottish Longbreads              |   12.5000 |       80 |
+| Scottish Longbreads              |   12.5000 |        2 |
+| Scottish Longbreads              |   12.5000 |       42 |
+| Scottish Longbreads              |   12.5000 |       55 |
+| Singaporean Hokkien Fried Mee    |    9.8000 |       10 |
+| Singaporean Hokkien Fried Mee    |   11.2000 |        2 |
+| Singaporean Hokkien Fried Mee    |   11.2000 |        6 |
+| Singaporean Hokkien Fried Mee    |   11.2000 |       10 |
+| Singaporean Hokkien Fried Mee    |   11.2000 |        9 |
+| Singaporean Hokkien Fried Mee    |   11.2000 |       40 |
+| Singaporean Hokkien Fried Mee    |   11.2000 |       50 |
+| Singaporean Hokkien Fried Mee    |   11.2000 |       20 |
+| Singaporean Hokkien Fried Mee    |   14.0000 |       30 |
+| Singaporean Hokkien Fried Mee    |   14.0000 |       20 |
+| Singaporean Hokkien Fried Mee    |   14.0000 |       28 |
+| Singaporean Hokkien Fried Mee    |   14.0000 |      100 |
+| Singaporean Hokkien Fried Mee    |   14.0000 |        5 |
+| Singaporean Hokkien Fried Mee    |   14.0000 |       20 |
+| Singaporean Hokkien Fried Mee    |   14.0000 |       30 |
+| Singaporean Hokkien Fried Mee    |   14.0000 |        6 |
+| Singaporean Hokkien Fried Mee    |   14.0000 |       40 |
+| Singaporean Hokkien Fried Mee    |   14.0000 |       28 |
+| Singaporean Hokkien Fried Mee    |   14.0000 |        2 |
+| Singaporean Hokkien Fried Mee    |   14.0000 |       12 |
+| Singaporean Hokkien Fried Mee    |   14.0000 |       20 |
+| Singaporean Hokkien Fried Mee    |   14.0000 |       42 |
+| Singaporean Hokkien Fried Mee    |   14.0000 |       20 |
+| Singaporean Hokkien Fried Mee    |   14.0000 |       25 |
+| Singaporean Hokkien Fried Mee    |   14.0000 |       10 |
+| Singaporean Hokkien Fried Mee    |   14.0000 |       40 |
+| Singaporean Hokkien Fried Mee    |   14.0000 |       24 |
+| Singaporean Hokkien Fried Mee    |   14.0000 |       14 |
+| Singaporean Hokkien Fried Mee    |   14.0000 |        4 |
+| Singaporean Hokkien Fried Mee    |   14.0000 |       30 |
+| Sir Rodney's Marmalade           |   64.8000 |       40 |
+| Sir Rodney's Marmalade           |   64.8000 |        6 |
+| Sir Rodney's Marmalade           |   64.8000 |       20 |
+| Sir Rodney's Marmalade           |   64.8000 |       12 |
+| Sir Rodney's Marmalade           |   64.8000 |       28 |
+| Sir Rodney's Marmalade           |   81.0000 |       39 |
+| Sir Rodney's Marmalade           |   81.0000 |       15 |
+| Sir Rodney's Marmalade           |   81.0000 |       21 |
+| Sir Rodney's Marmalade           |   81.0000 |       21 |
+| Sir Rodney's Marmalade           |   81.0000 |        5 |
+| Sir Rodney's Marmalade           |   81.0000 |       20 |
+| Sir Rodney's Marmalade           |   81.0000 |        5 |
+| Sir Rodney's Marmalade           |   81.0000 |       50 |
+| Sir Rodney's Marmalade           |   81.0000 |       15 |
+| Sir Rodney's Marmalade           |   81.0000 |       15 |
+| Sir Rodney's Marmalade           |   81.0000 |        1 |
+| Sir Rodney's Scones              |    8.0000 |       10 |
+| Sir Rodney's Scones              |    8.0000 |       20 |
+| Sir Rodney's Scones              |    8.0000 |       10 |
+| Sir Rodney's Scones              |    8.0000 |        5 |
+| Sir Rodney's Scones              |    8.0000 |       10 |
+| Sir Rodney's Scones              |    8.0000 |       30 |
+| Sir Rodney's Scones              |    8.0000 |       12 |
+| Sir Rodney's Scones              |    8.0000 |       50 |
+| Sir Rodney's Scones              |    8.0000 |       40 |
+| Sir Rodney's Scones              |    8.0000 |       40 |
+| Sir Rodney's Scones              |    8.0000 |       21 |
+| Sir Rodney's Scones              |    8.0000 |       14 |
+| Sir Rodney's Scones              |   10.0000 |       12 |
+| Sir Rodney's Scones              |   10.0000 |       40 |
+| Sir Rodney's Scones              |   10.0000 |       15 |
+| Sir Rodney's Scones              |   10.0000 |        6 |
+| Sir Rodney's Scones              |   10.0000 |        6 |
+| Sir Rodney's Scones              |   10.0000 |        8 |
+| Sir Rodney's Scones              |   10.0000 |       42 |
+| Sir Rodney's Scones              |   10.0000 |       25 |
+| Sir Rodney's Scones              |   10.0000 |       30 |
+| Sir Rodney's Scones              |   10.0000 |       60 |
+| Sir Rodney's Scones              |   10.0000 |       12 |
+| Sir Rodney's Scones              |   10.0000 |        5 |
+| Sir Rodney's Scones              |   10.0000 |       32 |
+| Sir Rodney's Scones              |   10.0000 |       30 |
+| Sir Rodney's Scones              |   10.0000 |       40 |
+| Sir Rodney's Scones              |   10.0000 |       40 |
+| Sir Rodney's Scones              |   10.0000 |       40 |
+| Sir Rodney's Scones              |   10.0000 |       20 |
+| Sir Rodney's Scones              |   10.0000 |       40 |
+| Sir Rodney's Scones              |   10.0000 |       60 |
+| Sir Rodney's Scones              |   10.0000 |       36 |
+| Sir Rodney's Scones              |   10.0000 |       12 |
+| Sir Rodney's Scones              |   10.0000 |       40 |
+| Sir Rodney's Scones              |   10.0000 |       65 |
+| Sir Rodney's Scones              |   10.0000 |       15 |
+| Sir Rodney's Scones              |   10.0000 |       20 |
+| Sir Rodney's Scones              |   10.0000 |        3 |
+| Sirop d'rable                    |   22.8000 |       16 |
+| Sirop d'rable                    |   22.8000 |       90 |
+| Sirop d'rable                    |   22.8000 |       25 |
+| Sirop d'rable                    |   28.5000 |       25 |
+| Sirop d'rable                    |   28.5000 |       15 |
+| Sirop d'rable                    |   28.5000 |       20 |
+| Sirop d'rable                    |   28.5000 |       10 |
+| Sirop d'rable                    |   28.5000 |      120 |
+| Sirop d'rable                    |   28.5000 |       20 |
+| Sirop d'rable                    |   28.5000 |       10 |
+| Sirop d'rable                    |   28.5000 |        5 |
+| Sirop d'rable                    |   28.5000 |       20 |
+| Sirop d'rable                    |   28.5000 |       20 |
+| Sirop d'rable                    |   28.5000 |       30 |
+| Sirop d'rable                    |   28.5000 |       30 |
+| Sirop d'rable                    |   28.5000 |       15 |
+| Sirop d'rable                    |   28.5000 |        5 |
+| Sirop d'rable                    |   28.5000 |       30 |
+| Sirop d'rable                    |   28.5000 |       66 |
+| Sirop d'rable                    |   28.5000 |        7 |
+| Sirop d'rable                    |   28.5000 |        6 |
+| Sirop d'rable                    |   28.5000 |        4 |
+| Sirop d'rable                    |   28.5000 |       10 |
+| Sirop d'rable                    |   28.5000 |        4 |
+| Spegesild                        |    9.6000 |       15 |
+| Spegesild                        |    9.6000 |       30 |
+| Spegesild                        |    9.6000 |       45 |
+| Spegesild                        |    9.6000 |       28 |
+| Spegesild                        |    9.6000 |        2 |
+| Spegesild                        |    9.6000 |       20 |
+| Spegesild                        |    9.6000 |        5 |
+| Spegesild                        |    9.6000 |       10 |
+| Spegesild                        |    9.6000 |       20 |
+| Spegesild                        |    9.6000 |        5 |
+| Spegesild                        |   12.0000 |        9 |
+| Spegesild                        |   12.0000 |        2 |
+| Spegesild                        |   12.0000 |       21 |
+| Spegesild                        |   12.0000 |       45 |
+| Spegesild                        |   12.0000 |       60 |
+| Spegesild                        |   12.0000 |       18 |
+| Spegesild                        |   12.0000 |       24 |
+| Spegesild                        |   12.0000 |       28 |
+| Spegesild                        |   12.0000 |       35 |
+| Spegesild                        |   12.0000 |       21 |
+| Spegesild                        |   12.0000 |       15 |
+| Spegesild                        |   12.0000 |        9 |
+| Spegesild                        |   12.0000 |       20 |
+| Spegesild                        |   12.0000 |       25 |
+| Spegesild                        |   12.0000 |        3 |
+| Spegesild                        |   12.0000 |       30 |
+| Spegesild                        |   12.0000 |        3 |
+| Steeleye Stout                   |   14.4000 |       20 |
+| Steeleye Stout                   |   14.4000 |        4 |
+| Steeleye Stout                   |   14.4000 |      100 |
+| Steeleye Stout                   |   14.4000 |       10 |
+| Steeleye Stout                   |   14.4000 |       70 |
+| Steeleye Stout                   |   14.4000 |       40 |
+| Steeleye Stout                   |   14.4000 |       30 |
+| Steeleye Stout                   |   14.4000 |       35 |
+| Steeleye Stout                   |   14.4000 |       60 |
+| Steeleye Stout                   |   14.4000 |        8 |
+| Steeleye Stout                   |   18.0000 |        3 |
+| Steeleye Stout                   |   18.0000 |       30 |
+| Steeleye Stout                   |   18.0000 |       20 |
+| Steeleye Stout                   |   18.0000 |        6 |
+| Steeleye Stout                   |   18.0000 |       20 |
+| Steeleye Stout                   |   18.0000 |       20 |
+| Steeleye Stout                   |   18.0000 |        4 |
+| Steeleye Stout                   |   18.0000 |       30 |
+| Steeleye Stout                   |   18.0000 |       30 |
+| Steeleye Stout                   |   18.0000 |        9 |
+| Steeleye Stout                   |   18.0000 |       21 |
+| Steeleye Stout                   |   18.0000 |       35 |
+| Steeleye Stout                   |   18.0000 |       15 |
+| Steeleye Stout                   |   18.0000 |       20 |
+| Steeleye Stout                   |   18.0000 |        8 |
+| Steeleye Stout                   |   18.0000 |        6 |
+| Steeleye Stout                   |   18.0000 |       25 |
+| Steeleye Stout                   |   18.0000 |        4 |
+| Steeleye Stout                   |   18.0000 |       30 |
+| Steeleye Stout                   |   18.0000 |        3 |
+| Steeleye Stout                   |   18.0000 |       10 |
+| Steeleye Stout                   |   18.0000 |       40 |
+| Steeleye Stout                   |   18.0000 |       15 |
+| Steeleye Stout                   |   18.0000 |       60 |
+| Steeleye Stout                   |   18.0000 |       24 |
+| Steeleye Stout                   |   18.0000 |       18 |
+| Tarte au sucre                   |   39.4000 |       15 |
+| Tarte au sucre                   |   39.4000 |       12 |
+| Tarte au sucre                   |   39.4000 |       40 |
+| Tarte au sucre                   |   39.4000 |       15 |
+| Tarte au sucre                   |   39.4000 |       10 |
+| Tarte au sucre                   |   39.4000 |        5 |
+| Tarte au sucre                   |   39.4000 |       25 |
+| Tarte au sucre                   |   39.4000 |       70 |
+| Tarte au sucre                   |   39.4000 |       28 |
+| Tarte au sucre                   |   39.4000 |       20 |
+| Tarte au sucre                   |   39.4000 |       10 |
+| Tarte au sucre                   |   39.4000 |       35 |
+| Tarte au sucre                   |   39.4000 |       40 |
+| Tarte au sucre                   |   39.4000 |       35 |
+| Tarte au sucre                   |   49.3000 |        3 |
+| Tarte au sucre                   |   49.3000 |       40 |
+| Tarte au sucre                   |   49.3000 |       20 |
+| Tarte au sucre                   |   49.3000 |       15 |
+| Tarte au sucre                   |   49.3000 |       10 |
+| Tarte au sucre                   |   49.3000 |       10 |
+| Tarte au sucre                   |   49.3000 |       10 |
+| Tarte au sucre                   |   49.3000 |       10 |
+| Tarte au sucre                   |   49.3000 |       15 |
+| Tarte au sucre                   |   49.3000 |       80 |
+| Tarte au sucre                   |   49.3000 |       10 |
+| Tarte au sucre                   |   49.3000 |       48 |
+| Tarte au sucre                   |   49.3000 |       20 |
+| Tarte au sucre                   |   49.3000 |        9 |
+| Tarte au sucre                   |   49.3000 |       30 |
+| Tarte au sucre                   |   49.3000 |       15 |
+| Tarte au sucre                   |   49.3000 |       20 |
+| Tarte au sucre                   |   49.3000 |        2 |
+| Tarte au sucre                   |   49.3000 |        5 |
+| Tarte au sucre                   |   49.3000 |       20 |
+| Tarte au sucre                   |   49.3000 |       25 |
+| Tarte au sucre                   |   49.3000 |        3 |
+| Tarte au sucre                   |   49.3000 |       50 |
+| Tarte au sucre                   |   49.3000 |        3 |
+| Tarte au sucre                   |   49.3000 |       20 |
+| Tarte au sucre                   |   49.3000 |        6 |
+| Tarte au sucre                   |   49.3000 |       35 |
+| Tarte au sucre                   |   49.3000 |       14 |
+| Tarte au sucre                   |   49.3000 |       30 |
+| Tarte au sucre                   |   49.3000 |       60 |
+| Tarte au sucre                   |   49.3000 |       12 |
+| Tarte au sucre                   |   49.3000 |       40 |
+| Tarte au sucre                   |   49.3000 |       21 |
+| Tarte au sucre                   |   49.3000 |       12 |
+| Teatime Chocolate Biscuits       |    7.3000 |        1 |
+| Teatime Chocolate Biscuits       |    7.3000 |       18 |
+| Teatime Chocolate Biscuits       |    7.3000 |       15 |
+| Teatime Chocolate Biscuits       |    7.3000 |       10 |
+| Teatime Chocolate Biscuits       |    7.3000 |       80 |
+| Teatime Chocolate Biscuits       |    7.3000 |       18 |
+| Teatime Chocolate Biscuits       |    7.3000 |       20 |
+| Teatime Chocolate Biscuits       |    7.3000 |        4 |
+| Teatime Chocolate Biscuits       |    7.3000 |       15 |
+| Teatime Chocolate Biscuits       |    7.3000 |       12 |
+| Teatime Chocolate Biscuits       |    7.3000 |       40 |
+| Teatime Chocolate Biscuits       |    7.3000 |       21 |
+| Teatime Chocolate Biscuits       |    7.3000 |        5 |
+| Teatime Chocolate Biscuits       |    9.2000 |       10 |
+| Teatime Chocolate Biscuits       |    9.2000 |       35 |
+| Teatime Chocolate Biscuits       |    9.2000 |        5 |
+| Teatime Chocolate Biscuits       |    9.2000 |       15 |
+| Teatime Chocolate Biscuits       |    9.2000 |       30 |
+| Teatime Chocolate Biscuits       |    9.2000 |       12 |
+| Teatime Chocolate Biscuits       |    9.2000 |        7 |
+| Teatime Chocolate Biscuits       |    9.2000 |       30 |
+| Teatime Chocolate Biscuits       |    9.2000 |        7 |
+| Teatime Chocolate Biscuits       |    9.2000 |        5 |
+| Teatime Chocolate Biscuits       |    9.2000 |       12 |
+| Teatime Chocolate Biscuits       |    9.2000 |       50 |
+| Teatime Chocolate Biscuits       |    9.2000 |       24 |
+| Teatime Chocolate Biscuits       |    9.2000 |       15 |
+| Teatime Chocolate Biscuits       |    9.2000 |        2 |
+| Teatime Chocolate Biscuits       |    9.2000 |       12 |
+| Teatime Chocolate Biscuits       |    9.2000 |       25 |
+| Teatime Chocolate Biscuits       |    9.2000 |       12 |
+| Teatime Chocolate Biscuits       |    9.2000 |        7 |
+| Teatime Chocolate Biscuits       |    9.2000 |       12 |
+| Teatime Chocolate Biscuits       |    9.2000 |       50 |
+| Teatime Chocolate Biscuits       |    9.2000 |       35 |
+| Teatime Chocolate Biscuits       |    9.2000 |       42 |
+| Teatime Chocolate Biscuits       |    9.2000 |       10 |
+| Thringer Rostbratwurst           |   99.0000 |       10 |
+| Thringer Rostbratwurst           |   99.0000 |       15 |
+| Thringer Rostbratwurst           |   99.0000 |       25 |
+| Thringer Rostbratwurst           |   99.0000 |        4 |
+| Thringer Rostbratwurst           |   99.0000 |       35 |
+| Thringer Rostbratwurst           |   99.0000 |       20 |
+| Thringer Rostbratwurst           |   99.0000 |       14 |
+| Thringer Rostbratwurst           |   99.0000 |       21 |
+| Thringer Rostbratwurst           |   99.0000 |       24 |
+| Thringer Rostbratwurst           |   99.0000 |       18 |
+| Thringer Rostbratwurst           |  123.7900 |       36 |
+| Thringer Rostbratwurst           |  123.7900 |       10 |
+| Thringer Rostbratwurst           |  123.7900 |        6 |
+| Thringer Rostbratwurst           |  123.7900 |       20 |
+| Thringer Rostbratwurst           |  123.7900 |       36 |
+| Thringer Rostbratwurst           |  123.7900 |       10 |
+| Thringer Rostbratwurst           |  123.7900 |       40 |
+| Thringer Rostbratwurst           |  123.7900 |       12 |
+| Thringer Rostbratwurst           |  123.7900 |       18 |
+| Thringer Rostbratwurst           |  123.7900 |       20 |
+| Thringer Rostbratwurst           |  123.7900 |       14 |
+| Thringer Rostbratwurst           |  123.7900 |       20 |
+| Thringer Rostbratwurst           |  123.7900 |        8 |
+| Thringer Rostbratwurst           |  123.7900 |       10 |
+| Thringer Rostbratwurst           |  123.7900 |       24 |
+| Thringer Rostbratwurst           |  123.7900 |       80 |
+| Thringer Rostbratwurst           |  123.7900 |       60 |
+| Thringer Rostbratwurst           |  123.7900 |       14 |
+| Thringer Rostbratwurst           |  123.7900 |       50 |
+| Thringer Rostbratwurst           |  123.7900 |        2 |
+| Thringer Rostbratwurst           |  123.7900 |       10 |
+| Thringer Rostbratwurst           |  123.7900 |       60 |
+| Tofu                             |   18.6000 |        9 |
+| Tofu                             |   18.6000 |        9 |
+| Tofu                             |   18.6000 |       10 |
+| Tofu                             |   18.6000 |       15 |
+| Tofu                             |   18.6000 |       42 |
+| Tofu                             |   18.6000 |       12 |
+| Tofu                             |   18.6000 |       20 |
+| Tofu                             |   18.6000 |       35 |
+| Tofu                             |   18.6000 |       12 |
+| Tofu                             |   23.2500 |       70 |
+| Tofu                             |   23.2500 |       30 |
+| Tofu                             |   23.2500 |       11 |
+| Tofu                             |   23.2500 |       15 |
+| Tofu                             |   23.2500 |       21 |
+| Tofu                             |   23.2500 |        3 |
+| Tofu                             |   23.2500 |        3 |
+| Tofu                             |   23.2500 |       30 |
+| Tofu                             |   23.2500 |       16 |
+| Tofu                             |   23.2500 |        5 |
+| Tofu                             |   23.2500 |       15 |
+| Tofu                             |   23.2500 |       20 |
+| Tofu                             |   23.2500 |        1 |
+| Tourtire                         |    5.9000 |       10 |
+| Tourtire                         |    5.9000 |        5 |
+| Tourtire                         |    5.9000 |       15 |
+| Tourtire                         |    5.9000 |       24 |
+| Tourtire                         |    5.9000 |       20 |
+| Tourtire                         |    5.9000 |       28 |
+| Tourtire                         |    5.9000 |       24 |
+| Tourtire                         |    5.9000 |       18 |
+| Tourtire                         |    5.9000 |       10 |
+| Tourtire                         |    5.9000 |        6 |
+| Tourtire                         |    5.9000 |       40 |
+| Tourtire                         |    5.9000 |       80 |
+| Tourtire                         |    5.9000 |       15 |
+| Tourtire                         |    5.9000 |        6 |
+| Tourtire                         |    5.9000 |       24 |
+| Tourtire                         |    7.4500 |       20 |
+| Tourtire                         |    7.4500 |       15 |
+| Tourtire                         |    7.4500 |       10 |
+| Tourtire                         |    7.4500 |       24 |
+| Tourtire                         |    7.4500 |       50 |
+| Tourtire                         |    7.4500 |        4 |
+| Tourtire                         |    7.4500 |       30 |
+| Tourtire                         |    7.4500 |        6 |
+| Tourtire                         |    7.4500 |       30 |
+| Tourtire                         |    7.4500 |       60 |
+| Tourtire                         |    7.4500 |       15 |
+| Tourtire                         |    7.4500 |       40 |
+| Tourtire                         |    7.4500 |        3 |
+| Tourtire                         |    7.4500 |        3 |
+| Tourtire                         |    7.4500 |        6 |
+| Tourtire                         |    7.4500 |        7 |
+| Tourtire                         |    7.4500 |       35 |
+| Tourtire                         |    7.4500 |       32 |
+| Tourtire                         |    7.4500 |       10 |
+| Tourtire                         |    7.4500 |       10 |
+| Tourtire                         |    7.4500 |       20 |
+| Tunnbrd                          |    7.2000 |       40 |
+| Tunnbrd                          |    7.2000 |       25 |
+| Tunnbrd                          |    7.2000 |       40 |
+| Tunnbrd                          |    7.2000 |       60 |
+| Tunnbrd                          |    7.2000 |       21 |
+| Tunnbrd                          |    7.2000 |       15 |
+| Tunnbrd                          |    7.2000 |       10 |
+| Tunnbrd                          |    9.0000 |       70 |
+| Tunnbrd                          |    9.0000 |       20 |
+| Tunnbrd                          |    9.0000 |       10 |
+| Tunnbrd                          |    9.0000 |       32 |
+| Tunnbrd                          |    9.0000 |        5 |
+| Tunnbrd                          |    9.0000 |       44 |
+| Tunnbrd                          |    9.0000 |       18 |
+| Tunnbrd                          |    9.0000 |       70 |
+| Tunnbrd                          |    9.0000 |       50 |
+| Tunnbrd                          |    9.0000 |       30 |
+| Tunnbrd                          |    9.0000 |        8 |
+| Tunnbrd                          |    9.0000 |       10 |
+| Tunnbrd                          |    9.0000 |        2 |
+| Uncle Bob's Organic Dried Pears  |   24.0000 |       15 |
+| Uncle Bob's Organic Dried Pears  |   24.0000 |       10 |
+| Uncle Bob's Organic Dried Pears  |   24.0000 |       16 |
+| Uncle Bob's Organic Dried Pears  |   24.0000 |       30 |
+| Uncle Bob's Organic Dried Pears  |   30.0000 |       50 |
+| Uncle Bob's Organic Dried Pears  |   30.0000 |       10 |
+| Uncle Bob's Organic Dried Pears  |   30.0000 |       10 |
+| Uncle Bob's Organic Dried Pears  |   30.0000 |       45 |
+| Uncle Bob's Organic Dried Pears  |   30.0000 |       35 |
+| Uncle Bob's Organic Dried Pears  |   30.0000 |       90 |
+| Uncle Bob's Organic Dried Pears  |   30.0000 |       35 |
+| Uncle Bob's Organic Dried Pears  |   30.0000 |        3 |
+| Uncle Bob's Organic Dried Pears  |   30.0000 |       20 |
+| Uncle Bob's Organic Dried Pears  |   30.0000 |        5 |
+| Uncle Bob's Organic Dried Pears  |   30.0000 |       20 |
+| Uncle Bob's Organic Dried Pears  |   30.0000 |       12 |
+| Uncle Bob's Organic Dried Pears  |   30.0000 |        8 |
+| Uncle Bob's Organic Dried Pears  |   30.0000 |        6 |
+| Uncle Bob's Organic Dried Pears  |   30.0000 |       45 |
+| Uncle Bob's Organic Dried Pears  |   30.0000 |       18 |
+| Uncle Bob's Organic Dried Pears  |   30.0000 |       20 |
+| Uncle Bob's Organic Dried Pears  |   30.0000 |       60 |
+| Uncle Bob's Organic Dried Pears  |   30.0000 |       60 |
+| Uncle Bob's Organic Dried Pears  |   30.0000 |       60 |
+| Uncle Bob's Organic Dried Pears  |   30.0000 |       20 |
+| Uncle Bob's Organic Dried Pears  |   30.0000 |        4 |
+| Uncle Bob's Organic Dried Pears  |   30.0000 |       40 |
+| Uncle Bob's Organic Dried Pears  |   30.0000 |       15 |
+| Uncle Bob's Organic Dried Pears  |   30.0000 |        1 |
+| Valkoinen suklaa                 |   13.0000 |       15 |
+| Valkoinen suklaa                 |   13.0000 |       15 |
+| Valkoinen suklaa                 |   13.0000 |       40 |
+| Valkoinen suklaa                 |   13.0000 |       25 |
+| Valkoinen suklaa                 |   16.2500 |       25 |
+| Valkoinen suklaa                 |   16.2500 |       40 |
+| Valkoinen suklaa                 |   16.2500 |       20 |
+| Valkoinen suklaa                 |   16.2500 |       24 |
+| Valkoinen suklaa                 |   16.2500 |        9 |
+| Valkoinen suklaa                 |   16.2500 |       22 |
+| Vegie-spread                     |   35.1000 |        8 |
+| Vegie-spread                     |   35.1000 |        5 |
+| Vegie-spread                     |   35.1000 |       80 |
+| Vegie-spread                     |   35.1000 |       16 |
+| Vegie-spread                     |   35.1000 |       65 |
+| Vegie-spread                     |   35.1000 |       35 |
+| Vegie-spread                     |   43.9000 |        6 |
+| Vegie-spread                     |   43.9000 |       24 |
+| Vegie-spread                     |   43.9000 |       20 |
+| Vegie-spread                     |   43.9000 |        9 |
+| Vegie-spread                     |   43.9000 |       30 |
+| Vegie-spread                     |   43.9000 |       40 |
+| Vegie-spread                     |   43.9000 |       10 |
+| Vegie-spread                     |   43.9000 |       20 |
+| Vegie-spread                     |   43.9000 |       35 |
+| Vegie-spread                     |   43.9000 |       12 |
+| Vegie-spread                     |   43.9000 |       30 |
+| Wimmers gute Semmelkndel         |   26.6000 |        9 |
+| Wimmers gute Semmelkndel         |   26.6000 |       50 |
+| Wimmers gute Semmelkndel         |   26.6000 |       35 |
+| Wimmers gute Semmelkndel         |   26.6000 |       30 |
+| Wimmers gute Semmelkndel         |   26.6000 |        7 |
+| Wimmers gute Semmelkndel         |   26.6000 |       30 |
+| Wimmers gute Semmelkndel         |   26.6000 |        6 |
+| Wimmers gute Semmelkndel         |   26.6000 |       35 |
+| Wimmers gute Semmelkndel         |   26.6000 |        8 |
+| Wimmers gute Semmelkndel         |   26.6000 |       30 |
+| Wimmers gute Semmelkndel         |   33.2500 |       30 |
+| Wimmers gute Semmelkndel         |   33.2500 |       18 |
+| Wimmers gute Semmelkndel         |   33.2500 |        6 |
+| Wimmers gute Semmelkndel         |   33.2500 |        9 |
+| Wimmers gute Semmelkndel         |   33.2500 |       15 |
+| Wimmers gute Semmelkndel         |   33.2500 |       28 |
+| Wimmers gute Semmelkndel         |   33.2500 |       24 |
+| Wimmers gute Semmelkndel         |   33.2500 |       35 |
+| Wimmers gute Semmelkndel         |   33.2500 |        3 |
+| Wimmers gute Semmelkndel         |   33.2500 |       30 |
+| Wimmers gute Semmelkndel         |   33.2500 |       48 |
+| Wimmers gute Semmelkndel         |   33.2500 |       30 |
+| Wimmers gute Semmelkndel         |   33.2500 |       15 |
+| Wimmers gute Semmelkndel         |   33.2500 |       20 |
+| Wimmers gute Semmelkndel         |   33.2500 |        8 |
+| Wimmers gute Semmelkndel         |   33.2500 |        4 |
+| Wimmers gute Semmelkndel         |   33.2500 |       20 |
+| Wimmers gute Semmelkndel         |   33.2500 |       25 |
+| Wimmers gute Semmelkndel         |   33.2500 |      130 |
+| Wimmers gute Semmelkndel         |   33.2500 |        2 |
+| Zaanse koeken                    |    7.6000 |       16 |
+| Zaanse koeken                    |    7.6000 |       55 |
+| Zaanse koeken                    |    7.6000 |       30 |
+| Zaanse koeken                    |    7.6000 |       30 |
+| Zaanse koeken                    |    9.5000 |        6 |
+| Zaanse koeken                    |    9.5000 |       25 |
+| Zaanse koeken                    |    9.5000 |       15 |
+| Zaanse koeken                    |    9.5000 |        6 |
+| Zaanse koeken                    |    9.5000 |       10 |
+| Zaanse koeken                    |    9.5000 |       40 |
+| Zaanse koeken                    |    9.5000 |       15 |
+| Zaanse koeken                    |    9.5000 |       12 |
+| Zaanse koeken                    |    9.5000 |        5 |
+| Zaanse koeken                    |    9.5000 |       50 |
+| Zaanse koeken                    |    9.5000 |       30 |
+| Zaanse koeken                    |    9.5000 |       30 |
+| Zaanse koeken                    |    9.5000 |       40 |
+| Zaanse koeken                    |    9.5000 |       21 |
+| Zaanse koeken                    |    9.5000 |        5 |
+| Zaanse koeken                    |    9.5000 |       14 |
+| Zaanse koeken                    |    9.5000 |       30 |
++----------------------------------+-----------+----------+
+2155 rows in set (0.08 sec)
+mysql-sql> select B.productname, A.unitprice, A.quantity from orderdetails A inner join products B on A.productid = B.productid limit 50;
++------------------+-----------+----------+
+| productname      | unitprice | quantity |
++------------------+-----------+----------+
+| Alice Mutton     |   31.2000 |       30 |
+| Alice Mutton     |   31.2000 |       15 |
+| Alice Mutton     |   31.2000 |       15 |
+| Alice Mutton     |   31.2000 |       40 |
+| Alice Mutton     |   31.2000 |        8 |
+| Alice Mutton     |   31.2000 |       20 |
+| Alice Mutton     |   31.2000 |       70 |
+| Alice Mutton     |   31.2000 |       36 |
+| Alice Mutton     |   31.2000 |        2 |
+| Alice Mutton     |   31.2000 |       45 |
+| Alice Mutton     |   31.2000 |       50 |
+| Alice Mutton     |   31.2000 |       10 |
+| Alice Mutton     |   39.0000 |       25 |
+| Alice Mutton     |   39.0000 |       40 |
+| Alice Mutton     |   39.0000 |        8 |
+| Alice Mutton     |   39.0000 |       16 |
+| Alice Mutton     |   39.0000 |       18 |
+| Alice Mutton     |   39.0000 |      100 |
+| Alice Mutton     |   39.0000 |       30 |
+| Alice Mutton     |   39.0000 |       20 |
+| Alice Mutton     |   39.0000 |        8 |
+| Alice Mutton     |   39.0000 |       27 |
+| Alice Mutton     |   39.0000 |       20 |
+| Alice Mutton     |   39.0000 |       33 |
+| Alice Mutton     |   39.0000 |       35 |
+| Alice Mutton     |   39.0000 |       40 |
+| Alice Mutton     |   39.0000 |        6 |
+| Alice Mutton     |   39.0000 |       42 |
+| Alice Mutton     |   39.0000 |       16 |
+| Alice Mutton     |   39.0000 |       15 |
+| Alice Mutton     |   39.0000 |       12 |
+| Alice Mutton     |   39.0000 |       10 |
+| Alice Mutton     |   39.0000 |       15 |
+| Alice Mutton     |   39.0000 |        6 |
+| Alice Mutton     |   39.0000 |        6 |
+| Alice Mutton     |   39.0000 |       12 |
+| Alice Mutton     |   39.0000 |       77 |
+| Aniseed Syrup    |    8.0000 |       30 |
+| Aniseed Syrup    |    8.0000 |       50 |
+| Aniseed Syrup    |    8.0000 |       20 |
+| Aniseed Syrup    |   10.0000 |       60 |
+| Aniseed Syrup    |   10.0000 |       14 |
+| Aniseed Syrup    |   10.0000 |        6 |
+| Aniseed Syrup    |   10.0000 |       20 |
+| Aniseed Syrup    |   10.0000 |       20 |
+| Aniseed Syrup    |   10.0000 |       49 |
+| Aniseed Syrup    |   10.0000 |       30 |
+| Aniseed Syrup    |   10.0000 |       25 |
+| Aniseed Syrup    |   10.0000 |        4 |
+| Boston Crab Meat |   14.7000 |       50 |
++------------------+-----------+----------+
+50 rows in set (0.00 sec)
+mysql-sql> select A.orderid, B.productname, A.unitprice, A.quantity from orderdetails A inner join products B on A.productid = B.productid limit 30;
++---------+--------------+-----------+----------+
+| orderid | productname  | unitprice | quantity |
++---------+--------------+-----------+----------+
+|   10265 | Alice Mutton |   31.2000 |       30 |
+|   10279 | Alice Mutton |   31.2000 |       15 |
+|   10294 | Alice Mutton |   31.2000 |       15 |
+|   10302 | Alice Mutton |   31.2000 |       40 |
+|   10319 | Alice Mutton |   31.2000 |        8 |
+|   10338 | Alice Mutton |   31.2000 |       20 |
+|   10339 | Alice Mutton |   31.2000 |       70 |
+|   10346 | Alice Mutton |   31.2000 |       36 |
+|   10415 | Alice Mutton |   31.2000 |        2 |
+|   10430 | Alice Mutton |   31.2000 |       45 |
+|   10431 | Alice Mutton |   31.2000 |       50 |
+|   10444 | Alice Mutton |   31.2000 |       10 |
+|   10523 | Alice Mutton |   39.0000 |       25 |
+|   10530 | Alice Mutton |   39.0000 |       40 |
+|   10550 | Alice Mutton |   39.0000 |        8 |
+|   10564 | Alice Mutton |   39.0000 |       16 |
+|   10573 | Alice Mutton |   39.0000 |       18 |
+|   10607 | Alice Mutton |   39.0000 |      100 |
+|   10686 | Alice Mutton |   39.0000 |       30 |
+|   10696 | Alice Mutton |   39.0000 |       20 |
+|   10698 | Alice Mutton |   39.0000 |        8 |
+|   10714 | Alice Mutton |   39.0000 |       27 |
+|   10727 | Alice Mutton |   39.0000 |       20 |
+|   10773 | Alice Mutton |   39.0000 |       33 |
+|   10795 | Alice Mutton |   39.0000 |       35 |
+|   10801 | Alice Mutton |   39.0000 |       40 |
+|   10852 | Alice Mutton |   39.0000 |        6 |
+|   10861 | Alice Mutton |   39.0000 |       42 |
+|   10871 | Alice Mutton |   39.0000 |       16 |
+|   10890 | Alice Mutton |   39.0000 |       15 |
++---------+--------------+-----------+----------+
+30 rows in set (0.00 sec)
+mysql-sql> select B.productname from orderdetails A right outer join products B on A.productid = B.productid where a.productid is null;
+Empty set (0.01 sec)
+mysql-sql>

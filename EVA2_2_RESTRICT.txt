@@ -1,0 +1,236 @@
+mysql-sql> \connect -c root@localhost:3306
+Creating a Classic Session to 'root@localhost:3306'
+Enter password: ****
+Your MySQL connection id is 62
+Server version: 5.7.21-log MySQL Community Server (GPL)
+No default schema selected; type \use <schema> to set one.
+mysql-sql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| ejercicios         |
+| evaluacion_2       |
+| mundo              |
+| mysql              |
+| performance_schema |
+| personal           |
+| sys                |
+| tecnologico        |
++--------------------+
+9 rows in set (0.36 sec)
+mysql-sql> use evaluacion_2;
+Query OK, 0 rows affected (0.02 sec)
+mysql-sql> show tables;
++------------------------+
+| Tables_in_evaluacion_2 |
++------------------------+
+| hijo                   |
+| hijos_2                |
+| padre                  |
++------------------------+
+3 rows in set (0.05 sec)
+mysql-sql> create table maestro(
+       ... id int not null key auto_increment,
+       ... nombre varchar(50));
+Query OK, 0 rows affected (1.99 sec)
+mysql-sql> create table detalle(
+       ... id int not null key auto_increment,
+       ... maestro_id int,
+       ... foreign key (maestro_id) references maestro(id) on delete restrict on update cascade);
+Query OK, 0 rows affected (1.11 sec)
+mysql-sql> show tables;
++------------------------+
+| Tables_in_evaluacion_2 |
++------------------------+
+| detalle                |
+| hijo                   |
+| hijos_2                |
+| maestro                |
+| padre                  |
++------------------------+
+5 rows in set (0.03 sec)
+mysql-sql> show create table detalle;
++---------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Table   | Create Table                                                                                                                                                                                                                                                                                               |
++---------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| detalle | CREATE TABLE `detalle` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `maestro_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `maestro_id` (`maestro_id`),
+  CONSTRAINT `detalle_ibfk_1` FOREIGN KEY (`maestro_id`) REFERENCES `maestro` (`id`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 |
++---------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+1 row in set (0.23 sec)
+mysql-sql> insert into maestro(nombre) values('dato 1');
+Query OK, 1 row affected (0.28 sec)
+mysql-sql> insert into maestro(nombre) values('dato 2');
+Query OK, 1 row affected (0.13 sec)
+mysql-sql> select*from maestro;
++----+--------+
+| id | nombre |
++----+--------+
+|  1 | dato 1 |
+|  2 | dato 2 |
++----+--------+
+2 rows in set (0.06 sec)
+mysql-sql> insert into detalle(maestro_id) values(1);
+Query OK, 1 row affected (0.10 sec)
+mysql-sql> insert into detalle(maestro_id) values(1);
+Query OK, 1 row affected (0.06 sec)
+mysql-sql> insert into detalle(maestro_id) values(2);
+Query OK, 1 row affected (0.06 sec)
+mysql-sql> insert into detalle(maestro_id) values(2);
+Query OK, 1 row affected (0.09 sec)
+mysql-sql> insert into detalle(maestro_id) values(2);
+Query OK, 1 row affected (0.13 sec)
+mysql-sql> select*from detalle;
++----+------------+
+| id | maestro_id |
++----+------------+
+|  1 |          1 |
+|  2 |          1 |
+|  3 |          2 |
+|  4 |          2 |
+|  5 |          2 |
++----+------------+
+5 rows in set (0.05 sec)
+mysql-sql> delete from maestro where id = 1;
+ERROR: 1451 (23000): Cannot delete or update a parent row: a foreign key constraint fails (`evaluacion_2`.`detalle`, CONSTRAINT `detalle_ibfk_1` FOREIGN KEY (`maestro_id`) REFERENCES `maestro` (`id`) ON UPDATE CASCADE)
+mysql-sql> select*from maestro;
++----+--------+
+| id | nombre |
++----+--------+
+|  1 | dato 1 |
+|  2 | dato 2 |
++----+--------+
+2 rows in set (0.00 sec)
+mysql-sql> update maestro set id=10 where id=1;
+Query OK, 1 row affected (0.45 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+mysql-sql> select*from maestro;
++----+--------+
+| id | nombre |
++----+--------+
+|  2 | dato 2 |
+| 10 | dato 1 |
++----+--------+
+2 rows in set (0.03 sec)
+mysql-sql> select*from detalle;
++----+------------+
+| id | maestro_id |
++----+------------+
+|  3 |          2 |
+|  4 |          2 |
+|  5 |          2 |
+|  1 |         10 |
+|  2 |         10 |
++----+------------+
+5 rows in set (0.01 sec)
+mysql-sql> create table alumnos(
+       ... id int not null key auto_increment,
+       ... nombre varchar(50),
+       ... no_control varchar(10) unique);
+Query OK, 0 rows affected (0.43 sec)
+mysql-sql> create table horarios(
+       ... id int not null key auto_increment,
+       ... alumno_id int,
+       ... foreign key (alumno_id) references alumnos(id)
+       ... on delete restrict
+       ... on uptade cascade);
+ERROR: 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'uptade cascade)' at line 6
+mysql-sql> create table horarios(
+       ... id int not null key auto_increment,
+       ... alumno_id int,
+       ... foreign key (alumno_id) references alumnos(id)  on delete restrict on update cascade);
+Query OK, 0 rows affected (0.73 sec)
+mysql-sql> create table detalle_materias(
+       ... id int not null key auto_increment,
+       ... horario_id int,
+       ... materia_id int,
+       ... foreign key (horario_id) references horarios(id) on delete restrict on update cascade);
+Query OK, 0 rows affected (0.70 sec)
+mysql-sql> create table materias(
+       ... id int not null key auto_increment,
+       ... nombre varchar(50) unique);
+Query OK, 0 rows affected (0.63 sec)
+mysql-sql> alter table detalle_materias add foreign key(materia_id) references materias(id) on delete restrict on update cascade;
+Query OK, 0 rows affected (1.30 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+mysql-sql> insert into detalle_materias(horari_id,materia_id) values(5,6);
+ERROR: 1054 (42S22): Unknown column 'horari_id' in 'field list'
+mysql-sql> insert into detalle_materias(horario_id,materia_id) values(5,6);
+ERROR: 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`evaluacion_2`.`detalle_materias`, CONSTRAINT `detalle_materias_ibfk_1` FOREIGN KEY (`horario_id`) REFERENCES `horarios` (`id`) ON UPDATE CASCADE)
+mysql-sql> insert into alumnos(nombre) values("Omar");
+Query OK, 1 row affected (0.08 sec)
+mysql-sql> insert into alumnos(nombre) values("Omar");
+Query OK, 1 row affected (0.03 sec)
+mysql-sql> select*from alumnos;
++----+--------+------------+
+| id | nombre | no_control |
++----+--------+------------+
+|  1 | Omar   | null       |
+|  2 | Omar   | null       |
++----+--------+------------+
+2 rows in set (0.00 sec)
+mysql-sql> insert into alumnos(nombre,no_control) values("Omar",1543);
+Query OK, 1 row affected (0.10 sec)
+mysql-sql> select*from alumnos;
++----+--------+------------+
+| id | nombre | no_control |
++----+--------+------------+
+|  1 | Omar   | null       |
+|  2 | Omar   | null       |
+|  3 | Omar   | 1543       |
++----+--------+------------+
+3 rows in set (0.00 sec)
+mysql-sql> insert into materias(nombre) values("Taller de base de datos");
+Query OK, 1 row affected (0.34 sec)
+mysql-sql> select*from materias;
++----+-------------------------+
+| id | nombre                  |
++----+-------------------------+
+|  1 | Taller de base de datos |
++----+-------------------------+
+1 row in set (0.00 sec)
+mysql-sql> desc horarios;
++-----------+---------+------+-----+---------+----------------+
+| Field     | Type    | Null | Key | Default | Extra          |
++-----------+---------+------+-----+---------+----------------+
+| id        | int(11) | NO   | PRI | null    | auto_increment |
+| alumno_id | int(11) | YES  | MUL | null    |                |
++-----------+---------+------+-----+---------+----------------+
+2 rows in set (0.41 sec)
+mysql-sql> insert into horarios(alumno_id) values(3);
+Query OK, 1 row affected (0.05 sec)
+mysql-sql> select*from horarios;
++----+-----------+
+| id | alumno_id |
++----+-----------+
+|  1 |         3 |
++----+-----------+
+1 row in set (0.00 sec)
+mysql-sql> desc detalle_materias;
++------------+---------+------+-----+---------+----------------+
+| Field      | Type    | Null | Key | Default | Extra          |
++------------+---------+------+-----+---------+----------------+
+| id         | int(11) | NO   | PRI | null    | auto_increment |
+| horario_id | int(11) | YES  | MUL | null    |                |
+| materia_id | int(11) | YES  | MUL | null    |                |
++------------+---------+------+-----+---------+----------------+
+3 rows in set (0.00 sec)
+mysql-sql> insert into detalle_materias(horario_id,materia_id) values(1,1);
+Query OK, 1 row affected (0.32 sec)
+mysql-sql> select * from detalle_materias;
++----+------------+------------+
+| id | horario_id | materia_id |
++----+------------+------------+
+|  2 |          1 |          1 |
++----+------------+------------+
+1 row in set (0.00 sec)
+mysql-sql> delete from materias where id=1;
+ERROR: 1451 (23000): Cannot delete or update a parent row: a foreign key constraint fails (`evaluacion_2`.`detalle_materias`, CONSTRAINT `detalle_materias_ibfk_2` FOREIGN KEY (`materia_id`) REFERENCES `materias` (`id`) ON UPDATE CASCADE)
+mysql-sql> delete from alumnos where id=3;
+ERROR: 1451 (23000): Cannot delete or update a parent row: a foreign key constraint fails (`evaluacion_2`.`horarios`, CONSTRAINT `horarios_ibfk_1` FOREIGN KEY (`alumno_id`) REFERENCES `alumnos` (`id`) ON UPDATE CASCADE)
+mysql-sql>
